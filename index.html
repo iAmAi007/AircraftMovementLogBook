@@ -1,0 +1,1068 @@
+<html lang="en"><head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Aircraft Table</title>
+    <style>
+        @font-face {
+            font-family: "SF Pro Regular";
+            src: url("/mnt/data/FontsFree-Net-SFProText-Regular.ttf") format("truetype");
+            font-weight: normal;
+            font-style: normal;
+        }
+        body {
+            font-family: "SF Pro Regular", Arial, sans-serif;
+            margin: 20px;
+            overflow-x: auto;
+        }
+        .table-container {
+            display: flex;
+            gap: 20px;
+            width: max-content;
+        }
+        table {
+            border-collapse: collapse;
+            table-layout: auto;
+            min-width: 800px;
+        }
+        thead {
+            border-top: 1px solid #2c5175;
+            border-bottom: 1px solid #2c5175;
+        }
+        tbody {
+            border-bottom: 1px solid #2c5175;
+        }
+        th {
+            text-align: left;
+            font-size: 16px;
+            font-weight: bold;
+            padding: 10px 5px;
+            color: #2c5175;
+            background-color: #FFFFFF;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        td {
+            padding: 10px 5px;
+            font-size: 16px;
+            color: #2c5175;
+            letter-spacing: 0.5px;
+        }
+        tr:nth-child(odd) {
+            background-color: #EAF3FB;
+        }
+        tr:nth-child(even) {
+            background-color: #FFFFFF;
+        }
+        th, td {
+            border: none;
+        }
+        td[contenteditable="true"]:focus {
+            outline: 2px solid #2c5175;
+            background-color: #f0f8ff;
+        }
+        .slider {
+            width: 100%;
+            overflow-x: auto;
+            margin-top: 20px;
+        }
+        .table-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 10px;
+        }
+        .table-header h2 {
+            font-size: 16px;
+            font-weight: bold;
+            color: #2c5175;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin: 0;
+        }
+        .table-header .header-input {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .table-header select,
+        .table-header input[type="date"] {
+            font-size: 16px;
+            padding: 5px;
+            border: none;
+            background: transparent;
+            color: #2c5175;
+            text-transform: uppercase;
+            font-weight: bold;
+        }
+        .table-header select:focus,
+        .table-header input[type="date"]:focus {
+            outline: none;
+        }
+        .table-header select option[disabled] {
+            color: #999;
+        }
+        .date-input-container {
+            position: relative;
+            display: inline-block;
+        }
+        .date-input-container input[type="date"] {
+            opacity: 0;
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            cursor: pointer;
+        }
+        .date-input-container .date-placeholder {
+            font-size: 16px;
+            color: #2c5175;
+            font-weight: bold;
+            pointer-events: none;
+        }
+        .date-input-container input[type="date"]:not(:focus) + .date-placeholder {
+            display: block;
+        }
+        .date-input-container input[type="date"]:focus + .date-placeholder {
+            display: none;
+        }
+    </style>
+</head>
+<body>
+    <div class="slider">
+        <div class="table-container">
+            <!-- Left Table Section -->
+            <div>
+                <div class="table-header">
+                    <h2>INBOUND TFC</h2>
+                    <div class="header-input">
+                        <!-- DAY Dropdown -->
+                        <select id="day-inbound">
+                            <option value="MON" selected="">MON</option>
+                            <option value="TUE">TUE</option>
+                            <option value="WED">WED</option>
+                            <option value="THU">THU</option>
+                            <option value="FRI">FRI</option>
+                            <option value="SAT">SAT</option>
+                            <option value="SUN">SUN</option>
+                        </select>
+                        <!-- DATE Picker -->
+                        <div class="date-input-container">
+                            <input type="date" id="date-inbound" value="2025-01-01">
+                            <span class="date-placeholder">01 JAN 2025</span>
+                        </div>
+                    </div>
+                </div>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>SVC</th>
+                            <th>REG</th>
+                            <th>TYPE</th>
+                            <th>FROM</th>
+                            <th>SKED</th>
+                            <th>ATC ETA</th>
+                            <th>PLN</th>
+                            <th>EET</th>
+                            <th>ETA EDZ</th>
+                            <th>REMARKS</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <!-- 38 rows with editable cells -->
+                        <tr>
+                            <td contenteditable="true"></td>
+                            <td contenteditable="true"></td>
+                            <td contenteditable="true"></td>
+                            <td contenteditable="true"></td>
+                            <td contenteditable="true" inputmode="numeric"></td>
+                            <td contenteditable="true" inputmode="numeric"></td>
+                            <td contenteditable="true"></td>
+                            <td contenteditable="true" inputmode="numeric"></td>
+                            <td contenteditable="true" inputmode="numeric"></td>
+                            <td contenteditable="true"></td>
+                        </tr>
+                        <tr>
+                            <td contenteditable="true"></td>
+                            <td contenteditable="true"></td>
+                            <td contenteditable="true"></td>
+                            <td contenteditable="true"></td>
+                            <td contenteditable="true" inputmode="numeric"></td>
+                            <td contenteditable="true" inputmode="numeric"></td>
+                            <td contenteditable="true"></td>
+                            <td contenteditable="true" inputmode="numeric"></td>
+                            <td contenteditable="true" inputmode="numeric"></td>
+                            <td contenteditable="true"></td>
+                        </tr>
+                        <tr>
+                            <td contenteditable="true"></td>
+                            <td contenteditable="true"></td>
+                            <td contenteditable="true"></td>
+                            <td contenteditable="true"></td>
+                            <td contenteditable="true" inputmode="numeric"></td>
+                            <td contenteditable="true" inputmode="numeric"></td>
+                            <td contenteditable="true"></td>
+                            <td contenteditable="true" inputmode="numeric"></td>
+                            <td contenteditable="true" inputmode="numeric"></td>
+                            <td contenteditable="true"></td>
+                        </tr>
+                        <tr>
+                            <td contenteditable="true"></td>
+                            <td contenteditable="true"></td>
+                            <td contenteditable="true"></td>
+                            <td contenteditable="true"></td>
+                            <td contenteditable="true" inputmode="numeric"></td>
+                            <td contenteditable="true" inputmode="numeric"></td>
+                            <td contenteditable="true"></td>
+                            <td contenteditable="true" inputmode="numeric"></td>
+                            <td contenteditable="true" inputmode="numeric"></td>
+                            <td contenteditable="true"></td>
+                        </tr>
+                        <tr>
+                            <td contenteditable="true"></td>
+                            <td contenteditable="true"></td>
+                            <td contenteditable="true"></td>
+                            <td contenteditable="true"></td>
+                            <td contenteditable="true" inputmode="numeric"></td>
+                            <td contenteditable="true" inputmode="numeric"></td>
+                            <td contenteditable="true"></td>
+                            <td contenteditable="true" inputmode="numeric"></td>
+                            <td contenteditable="true" inputmode="numeric"></td>
+                            <td contenteditable="true"></td>
+                        </tr>
+                        <tr>
+                            <td contenteditable="true"></td>
+                            <td contenteditable="true"></td>
+                            <td contenteditable="true"></td>
+                            <td contenteditable="true"></td>
+                            <td contenteditable="true" inputmode="numeric"></td>
+                            <td contenteditable="true" inputmode="numeric"></td>
+                            <td contenteditable="true"></td>
+                            <td contenteditable="true" inputmode="numeric"></td>
+                            <td contenteditable="true" inputmode="numeric"></td>
+                            <td contenteditable="true"></td>
+                        </tr>
+                        <tr>
+                            <td contenteditable="true"></td>
+                            <td contenteditable="true"></td>
+                            <td contenteditable="true"></td>
+                            <td contenteditable="true"></td>
+                            <td contenteditable="true" inputmode="numeric"></td>
+                            <td contenteditable="true" inputmode="numeric"></td>
+                            <td contenteditable="true"></td>
+                            <td contenteditable="true" inputmode="numeric"></td>
+                            <td contenteditable="true" inputmode="numeric"></td>
+                            <td contenteditable="true"></td>
+                        </tr>
+                        <tr>
+                            <td contenteditable="true"></td>
+                            <td contenteditable="true"></td>
+                            <td contenteditable="true"></td>
+                            <td contenteditable="true"></td>
+                            <td contenteditable="true" inputmode="numeric"></td>
+                            <td contenteditable="true" inputmode="numeric"></td>
+                            <td contenteditable="true"></td>
+                            <td contenteditable="true" inputmode="numeric"></td>
+                            <td contenteditable="true" inputmode="numeric"></td>
+                            <td contenteditable="true"></td>
+                        </tr>
+                        <tr>
+                            <td contenteditable="true"></td>
+                            <td contenteditable="true"></td>
+                            <td contenteditable="true"></td>
+                            <td contenteditable="true"></td>
+                            <td contenteditable="true" inputmode="numeric"></td>
+                            <td contenteditable="true" inputmode="numeric"></td>
+                            <td contenteditable="true"></td>
+                            <td contenteditable="true" inputmode="numeric"></td>
+                            <td contenteditable="true" inputmode="numeric"></td>
+                            <td contenteditable="true"></td>
+                        </tr>
+                        <tr>
+                            <td contenteditable="true"></td>
+                            <td contenteditable="true"></td>
+                            <td contenteditable="true"></td>
+                            <td contenteditable="true"></td>
+                            <td contenteditable="true" inputmode="numeric"></td>
+                            <td contenteditable="true" inputmode="numeric"></td>
+                            <td contenteditable="true"></td>
+                            <td contenteditable="true" inputmode="numeric"></td>
+                            <td contenteditable="true" inputmode="numeric"></td>
+                            <td contenteditable="true"></td>
+                        </tr>
+                        <tr>
+                            <td contenteditable="true"></td>
+                            <td contenteditable="true"></td>
+                            <td contenteditable="true"></td>
+                            <td contenteditable="true"></td>
+                            <td contenteditable="true" inputmode="numeric"></td>
+                            <td contenteditable="true" inputmode="numeric"></td>
+                            <td contenteditable="true"></td>
+                            <td contenteditable="true" inputmode="numeric"></td>
+                            <td contenteditable="true" inputmode="numeric"></td>
+                            <td contenteditable="true"></td>
+                        </tr>
+                        <tr>
+                            <td contenteditable="true"></td>
+                            <td contenteditable="true"></td>
+                            <td contenteditable="true"></td>
+                            <td contenteditable="true"></td>
+                            <td contenteditable="true" inputmode="numeric"></td>
+                            <td contenteditable="true" inputmode="numeric"></td>
+                            <td contenteditable="true"></td>
+                            <td contenteditable="true" inputmode="numeric"></td>
+                            <td contenteditable="true" inputmode="numeric"></td>
+                            <td contenteditable="true"></td>
+                        </tr>
+                        <tr>
+                            <td contenteditable="true"></td>
+                            <td contenteditable="true"></td>
+                            <td contenteditable="true"></td>
+                            <td contenteditable="true"></td>
+                            <td contenteditable="true" inputmode="numeric"></td>
+                            <td contenteditable="true" inputmode="numeric"></td>
+                            <td contenteditable="true"></td>
+                            <td contenteditable="true" inputmode="numeric"></td>
+                            <td contenteditable="true" inputmode="numeric"></td>
+                            <td contenteditable="true"></td>
+                        </tr>
+                        <tr>
+                            <td contenteditable="true"></td>
+                            <td contenteditable="true"></td>
+                            <td contenteditable="true"></td>
+                            <td contenteditable="true"></td>
+                            <td contenteditable="true" inputmode="numeric"></td>
+                            <td contenteditable="true" inputmode="numeric"></td>
+                            <td contenteditable="true"></td>
+                            <td contenteditable="true" inputmode="numeric"></td>
+                            <td contenteditable="true" inputmode="numeric"></td>
+                            <td contenteditable="true"></td>
+                        </tr>
+                        <tr>
+                            <td contenteditable="true"></td>
+                            <td contenteditable="true"></td>
+                            <td contenteditable="true"></td>
+                            <td contenteditable="true"></td>
+                            <td contenteditable="true" inputmode="numeric"></td>
+                            <td contenteditable="true" inputmode="numeric"></td>
+                            <td contenteditable="true"></td>
+                            <td contenteditable="true" inputmode="numeric"></td>
+                            <td contenteditable="true" inputmode="numeric"></td>
+                            <td contenteditable="true"></td>
+                        </tr>
+                        <tr>
+                            <td contenteditable="true"></td>
+                            <td contenteditable="true"></td>
+                            <td contenteditable="true"></td>
+                            <td contenteditable="true"></td>
+                            <td contenteditable="true" inputmode="numeric"></td>
+                            <td contenteditable="true" inputmode="numeric"></td>
+                            <td contenteditable="true"></td>
+                            <td contenteditable="true" inputmode="numeric"></td>
+                            <td contenteditable="true" inputmode="numeric"></td>
+                            <td contenteditable="true"></td>
+                        </tr>
+                        <tr>
+                            <td contenteditable="true"></td>
+                            <td contenteditable="true"></td>
+                            <td contenteditable="true"></td>
+                            <td contenteditable="true"></td>
+                            <td contenteditable="true" inputmode="numeric"></td>
+                            <td contenteditable="true" inputmode="numeric"></td>
+                            <td contenteditable="true"></td>
+                            <td contenteditable="true" inputmode="numeric"></td>
+                            <td contenteditable="true" inputmode="numeric"></td>
+                            <td contenteditable="true"></td>
+                        </tr>
+                        <tr>
+                            <td contenteditable="true"></td>
+                            <td contenteditable="true"></td>
+                            <td contenteditable="true"></td>
+                            <td contenteditable="true"></td>
+                            <td contenteditable="true" inputmode="numeric"></td>
+                            <td contenteditable="true" inputmode="numeric"></td>
+                            <td contenteditable="true"></td>
+                            <td contenteditable="true" inputmode="numeric"></td>
+                            <td contenteditable="true" inputmode="numeric"></td>
+                            <td contenteditable="true"></td>
+                        </tr>
+                        <tr>
+                            <td contenteditable="true"></td>
+                            <td contenteditable="true"></td>
+                            <td contenteditable="true"></td>
+                            <td contenteditable="true"></td>
+                            <td contenteditable="true" inputmode="numeric"></td>
+                            <td contenteditable="true" inputmode="numeric"></td>
+                            <td contenteditable="true"></td>
+                            <td contenteditable="true" inputmode="numeric"></td>
+                            <td contenteditable="true" inputmode="numeric"></td>
+                            <td contenteditable="true"></td>
+                        </tr>
+                        <tr>
+                            <td contenteditable="true"></td>
+                            <td contenteditable="true"></td>
+                            <td contenteditable="true"></td>
+                            <td contenteditable="true"></td>
+                            <td contenteditable="true" inputmode="numeric"></td>
+                            <td contenteditable="true" inputmode="numeric"></td>
+                            <td contenteditable="true"></td>
+                            <td contenteditable="true" inputmode="numeric"></td>
+                            <td contenteditable="true" inputmode="numeric"></td>
+                            <td contenteditable="true"></td>
+                        </tr>
+                        <tr>
+                            <td contenteditable="true"></td>
+                            <td contenteditable="true"></td>
+                            <td contenteditable="true"></td>
+                            <td contenteditable="true"></td>
+                            <td contenteditable="true" inputmode="numeric"></td>
+                            <td contenteditable="true" inputmode="numeric"></td>
+                            <td contenteditable="true"></td>
+                            <td contenteditable="true" inputmode="numeric"></td>
+                            <td contenteditable="true" inputmode="numeric"></td>
+                            <td contenteditable="true"></td>
+                        </tr>
+                        <tr>
+                            <td contenteditable="true"></td>
+                            <td contenteditable="true"></td>
+                            <td contenteditable="true"></td>
+                            <td contenteditable="true"></td>
+                            <td contenteditable="true" inputmode="numeric"></td>
+                            <td contenteditable="true" inputmode="numeric"></td>
+                            <td contenteditable="true"></td>
+                            <td contenteditable="true" inputmode="numeric"></td>
+                            <td contenteditable="true" inputmode="numeric"></td>
+                            <td contenteditable="true"></td>
+                        </tr>
+                        <tr>
+                            <td contenteditable="true"></td>
+                            <td contenteditable="true"></td>
+                            <td contenteditable="true"></td>
+                            <td contenteditable="true"></td>
+                            <td contenteditable="true" inputmode="numeric"></td>
+                            <td contenteditable="true" inputmode="numeric"></td>
+                            <td contenteditable="true"></td>
+                            <td contenteditable="true" inputmode="numeric"></td>
+                            <td contenteditable="true" inputmode="numeric"></td>
+                            <td contenteditable="true"></td>
+                        </tr>
+                        <tr>
+                            <td contenteditable="true"></td>
+                            <td contenteditable="true"></td>
+                            <td contenteditable="true"></td>
+                            <td contenteditable="true"></td>
+                            <td contenteditable="true" inputmode="numeric"></td>
+                            <td contenteditable="true" inputmode="numeric"></td>
+                            <td contenteditable="true"></td>
+                            <td contenteditable="true" inputmode="numeric"></td>
+                            <td contenteditable="true" inputmode="numeric"></td>
+                            <td contenteditable="true"></td>
+                        </tr>
+                        <tr>
+                            <td contenteditable="true"></td>
+                            <td contenteditable="true"></td>
+                            <td contenteditable="true"></td>
+                            <td contenteditable="true"></td>
+                            <td contenteditable="true" inputmode="numeric"></td>
+                            <td contenteditable="true" inputmode="numeric"></td>
+                            <td contenteditable="true"></td>
+                            <td contenteditable="true" inputmode="numeric"></td>
+                            <td contenteditable="true" inputmode="numeric"></td>
+                            <td contenteditable="true"></td>
+                        </tr>
+                        <tr>
+                            <td contenteditable="true"></td>
+                            <td contenteditable="true"></td>
+                            <td contenteditable="true"></td>
+                            <td contenteditable="true"></td>
+                            <td contenteditable="true" inputmode="numeric"></td>
+                            <td contenteditable="true" inputmode="numeric"></td>
+                            <td contenteditable="true"></td>
+                            <td contenteditable="true" inputmode="numeric"></td>
+                            <td contenteditable="true" inputmode="numeric"></td>
+                            <td contenteditable="true"></td>
+                        </tr>
+                        <tr>
+                            <td contenteditable="true"></td>
+                            <td contenteditable="true"></td>
+                            <td contenteditable="true"></td>
+                            <td contenteditable="true"></td>
+                            <td contenteditable="true" inputmode="numeric"></td>
+                            <td contenteditable="true" inputmode="numeric"></td>
+                            <td contenteditable="true"></td>
+                            <td contenteditable="true" inputmode="numeric"></td>
+                            <td contenteditable="true" inputmode="numeric"></td>
+                            <td contenteditable="true"></td>
+                        </tr>
+                        <tr>
+                            <td contenteditable="true"></td>
+                            <td contenteditable="true"></td>
+                            <td contenteditable="true"></td>
+                            <td contenteditable="true"></td>
+                            <td contenteditable="true" inputmode="numeric"></td>
+                            <td contenteditable="true" inputmode="numeric"></td>
+                            <td contenteditable="true"></td>
+                            <td contenteditable="true" inputmode="numeric"></td>
+                            <td contenteditable="true" inputmode="numeric"></td>
+                            <td contenteditable="true"></td>
+                        </tr>
+                        <tr>
+                            <td contenteditable="true"></td>
+                            <td contenteditable="true"></td>
+                            <td contenteditable="true"></td>
+                            <td contenteditable="true"></td>
+                            <td contenteditable="true" inputmode="numeric"></td>
+                            <td contenteditable="true" inputmode="numeric"></td>
+                            <td contenteditable="true"></td>
+                            <td contenteditable="true" inputmode="numeric"></td>
+                            <td contenteditable="true" inputmode="numeric"></td>
+                            <td contenteditable="true"></td>
+                        </tr>
+                        <tr>
+                            <td contenteditable="true"></td>
+                            <td contenteditable="true"></td>
+                            <td contenteditable="true"></td>
+                            <td contenteditable="true"></td>
+                            <td contenteditable="true" inputmode="numeric"></td>
+                            <td contenteditable="true" inputmode="numeric"></td>
+                            <td contenteditable="true"></td>
+                            <td contenteditable="true" inputmode="numeric"></td>
+                            <td contenteditable="true" inputmode="numeric"></td>
+                            <td contenteditable="true"></td>
+                        </tr>
+
+                        <!-- Repeat the above row 37 more times -->
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- Right Table Section -->
+            <div>
+                <div class="table-header">
+                    <h2>OUTBOUND TFC</h2>
+                    <div class="header-input">
+                        <!-- DAY Dropdown -->
+                        <select id="day-outbound">
+                            <option value="MON" selected="">MON</option>
+                            <option value="TUE">TUE</option>
+                            <option value="WED">WED</option>
+                            <option value="THU">THU</option>
+                            <option value="FRI">FRI</option>
+                            <option value="SAT">SAT</option>
+                            <option value="SUN">SUN</option>
+                        </select>
+                        <!-- DATE Picker -->
+                        <div class="date-input-container">
+                            <input type="date" id="date-outbound" value="2025-01-01">
+                            <span class="date-placeholder">01 JAN 2025</span>
+                        </div>
+                    </div>
+                </div>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>AIM</th>
+                            <th>REG</th>
+                            <th>TYPE</th>
+                            <th>SVC</th>
+                            <th>DEST</th>
+                            <th>EOBT</th>
+                            <th>ATD</th>
+                            <th>POB</th>
+                            <th>FR</th>
+                            <th>ADDRESSEE’S</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <!-- 38 rows with editable cells -->
+                        <tr>
+                            <td contenteditable="true" inputmode="numeric" class="aim-cell"></td>
+                            <td contenteditable="true"></td>
+                            <td contenteditable="true"></td>
+                            <td contenteditable="true"></td>
+                            <td contenteditable="true"></td>
+                            <td contenteditable="true" inputmode="numeric"></td>
+                            <td contenteditable="true" inputmode="numeric"></td>
+                            <td contenteditable="true" inputmode="numeric"></td>
+                            <td contenteditable="true" inputmode="numeric"></td>
+                            <td contenteditable="true"></td>
+                        </tr>
+                        <tr>
+                            <td contenteditable="true" inputmode="numeric" class="aim-cell"></td>
+                            <td contenteditable="true"></td>
+                            <td contenteditable="true"></td>
+                            <td contenteditable="true"></td>
+                            <td contenteditable="true"></td>
+                            <td contenteditable="true" inputmode="numeric"></td>
+                            <td contenteditable="true" inputmode="numeric"></td>
+                            <td contenteditable="true" inputmode="numeric"></td>
+                            <td contenteditable="true" inputmode="numeric"></td>
+                            <td contenteditable="true"></td>
+                        </tr>
+                        <tr>
+                            <td contenteditable="true" inputmode="numeric" class="aim-cell"></td>
+                            <td contenteditable="true"></td>
+                            <td contenteditable="true"></td>
+                            <td contenteditable="true"></td>
+                            <td contenteditable="true"></td>
+                            <td contenteditable="true" inputmode="numeric"></td>
+                            <td contenteditable="true" inputmode="numeric"></td>
+                            <td contenteditable="true" inputmode="numeric"></td>
+                            <td contenteditable="true" inputmode="numeric"></td>
+                            <td contenteditable="true"></td>
+                        </tr>
+                        <tr>
+                            <td contenteditable="true" inputmode="numeric" class="aim-cell"></td>
+                            <td contenteditable="true"></td>
+                            <td contenteditable="true"></td>
+                            <td contenteditable="true"></td>
+                            <td contenteditable="true"></td>
+                            <td contenteditable="true" inputmode="numeric"></td>
+                            <td contenteditable="true" inputmode="numeric"></td>
+                            <td contenteditable="true" inputmode="numeric"></td>
+                            <td contenteditable="true" inputmode="numeric"></td>
+                            <td contenteditable="true"></td>
+                        </tr>
+                        <tr>
+                            <td contenteditable="true" inputmode="numeric" class="aim-cell"></td>
+                            <td contenteditable="true"></td>
+                            <td contenteditable="true"></td>
+                            <td contenteditable="true"></td>
+                            <td contenteditable="true"></td>
+                            <td contenteditable="true" inputmode="numeric"></td>
+                            <td contenteditable="true" inputmode="numeric"></td>
+                            <td contenteditable="true" inputmode="numeric"></td>
+                            <td contenteditable="true" inputmode="numeric"></td>
+                            <td contenteditable="true"></td>
+                        </tr>
+                        <tr>
+                            <td contenteditable="true" inputmode="numeric" class="aim-cell"></td>
+                            <td contenteditable="true"></td>
+                            <td contenteditable="true"></td>
+                            <td contenteditable="true"></td>
+                            <td contenteditable="true"></td>
+                            <td contenteditable="true" inputmode="numeric"></td>
+                            <td contenteditable="true" inputmode="numeric"></td>
+                            <td contenteditable="true" inputmode="numeric"></td>
+                            <td contenteditable="true" inputmode="numeric"></td>
+                            <td contenteditable="true"></td>
+                        </tr>
+                        <tr>
+                            <td contenteditable="true" inputmode="numeric" class="aim-cell"></td>
+                            <td contenteditable="true"></td>
+                            <td contenteditable="true"></td>
+                            <td contenteditable="true"></td>
+                            <td contenteditable="true"></td>
+                            <td contenteditable="true" inputmode="numeric"></td>
+                            <td contenteditable="true" inputmode="numeric"></td>
+                            <td contenteditable="true" inputmode="numeric"></td>
+                            <td contenteditable="true" inputmode="numeric"></td>
+                            <td contenteditable="true"></td>
+                        </tr>
+                        <tr>
+                            <td contenteditable="true" inputmode="numeric" class="aim-cell"></td>
+                            <td contenteditable="true"></td>
+                            <td contenteditable="true"></td>
+                            <td contenteditable="true"></td>
+                            <td contenteditable="true"></td>
+                            <td contenteditable="true" inputmode="numeric"></td>
+                            <td contenteditable="true" inputmode="numeric"></td>
+                            <td contenteditable="true" inputmode="numeric"></td>
+                            <td contenteditable="true" inputmode="numeric"></td>
+                            <td contenteditable="true"></td>
+                        </tr>
+                        <tr>
+                            <td contenteditable="true" inputmode="numeric" class="aim-cell"></td>
+                            <td contenteditable="true"></td>
+                            <td contenteditable="true"></td>
+                            <td contenteditable="true"></td>
+                            <td contenteditable="true"></td>
+                            <td contenteditable="true" inputmode="numeric"></td>
+                            <td contenteditable="true" inputmode="numeric"></td>
+                            <td contenteditable="true" inputmode="numeric"></td>
+                            <td contenteditable="true" inputmode="numeric"></td>
+                            <td contenteditable="true"></td>
+                        </tr>
+                        <tr>
+                            <td contenteditable="true" inputmode="numeric" class="aim-cell"></td>
+                            <td contenteditable="true"></td>
+                            <td contenteditable="true"></td>
+                            <td contenteditable="true"></td>
+                            <td contenteditable="true"></td>
+                            <td contenteditable="true" inputmode="numeric"></td>
+                            <td contenteditable="true" inputmode="numeric"></td>
+                            <td contenteditable="true" inputmode="numeric"></td>
+                            <td contenteditable="true" inputmode="numeric"></td>
+                            <td contenteditable="true"></td>
+                        </tr>
+                        <tr>
+                            <td contenteditable="true" inputmode="numeric" class="aim-cell"></td>
+                            <td contenteditable="true"></td>
+                            <td contenteditable="true"></td>
+                            <td contenteditable="true"></td>
+                            <td contenteditable="true"></td>
+                            <td contenteditable="true" inputmode="numeric"></td>
+                            <td contenteditable="true" inputmode="numeric"></td>
+                            <td contenteditable="true" inputmode="numeric"></td>
+                            <td contenteditable="true" inputmode="numeric"></td>
+                            <td contenteditable="true"></td>
+                        </tr>
+                        <tr>
+                            <td contenteditable="true" inputmode="numeric" class="aim-cell"></td>
+                            <td contenteditable="true"></td>
+                            <td contenteditable="true"></td>
+                            <td contenteditable="true"></td>
+                            <td contenteditable="true"></td>
+                            <td contenteditable="true" inputmode="numeric"></td>
+                            <td contenteditable="true" inputmode="numeric"></td>
+                            <td contenteditable="true" inputmode="numeric"></td>
+                            <td contenteditable="true" inputmode="numeric"></td>
+                            <td contenteditable="true"></td>
+                        </tr>
+                        <tr>
+                            <td contenteditable="true" inputmode="numeric" class="aim-cell"></td>
+                            <td contenteditable="true"></td>
+                            <td contenteditable="true"></td>
+                            <td contenteditable="true"></td>
+                            <td contenteditable="true"></td>
+                            <td contenteditable="true" inputmode="numeric"></td>
+                            <td contenteditable="true" inputmode="numeric"></td>
+                            <td contenteditable="true" inputmode="numeric"></td>
+                            <td contenteditable="true" inputmode="numeric"></td>
+                            <td contenteditable="true"></td>
+                        </tr>
+                        <tr>
+                            <td contenteditable="true" inputmode="numeric" class="aim-cell"></td>
+                            <td contenteditable="true"></td>
+                            <td contenteditable="true"></td>
+                            <td contenteditable="true"></td>
+                            <td contenteditable="true"></td>
+                            <td contenteditable="true" inputmode="numeric"></td>
+                            <td contenteditable="true" inputmode="numeric"></td>
+                            <td contenteditable="true" inputmode="numeric"></td>
+                            <td contenteditable="true" inputmode="numeric"></td>
+                            <td contenteditable="true"></td>
+                        </tr>
+                        <tr>
+                            <td contenteditable="true" inputmode="numeric" class="aim-cell"></td>
+                            <td contenteditable="true"></td>
+                            <td contenteditable="true"></td>
+                            <td contenteditable="true"></td>
+                            <td contenteditable="true"></td>
+                            <td contenteditable="true" inputmode="numeric"></td>
+                            <td contenteditable="true" inputmode="numeric"></td>
+                            <td contenteditable="true" inputmode="numeric"></td>
+                            <td contenteditable="true" inputmode="numeric"></td>
+                            <td contenteditable="true"></td>
+                        </tr>
+                        <tr>
+                            <td contenteditable="true" inputmode="numeric" class="aim-cell"></td>
+                            <td contenteditable="true"></td>
+                            <td contenteditable="true"></td>
+                            <td contenteditable="true"></td>
+                            <td contenteditable="true"></td>
+                            <td contenteditable="true" inputmode="numeric"></td>
+                            <td contenteditable="true" inputmode="numeric"></td>
+                            <td contenteditable="true" inputmode="numeric"></td>
+                            <td contenteditable="true" inputmode="numeric"></td>
+                            <td contenteditable="true"></td>
+                        </tr>
+                        <tr>
+                            <td contenteditable="true" inputmode="numeric" class="aim-cell"></td>
+                            <td contenteditable="true"></td>
+                            <td contenteditable="true"></td>
+                            <td contenteditable="true"></td>
+                            <td contenteditable="true"></td>
+                            <td contenteditable="true" inputmode="numeric"></td>
+                            <td contenteditable="true" inputmode="numeric"></td>
+                            <td contenteditable="true" inputmode="numeric"></td>
+                            <td contenteditable="true" inputmode="numeric"></td>
+                            <td contenteditable="true"></td>
+                        </tr>
+                        <tr>
+                            <td contenteditable="true" inputmode="numeric" class="aim-cell"></td>
+                            <td contenteditable="true"></td>
+                            <td contenteditable="true"></td>
+                            <td contenteditable="true"></td>
+                            <td contenteditable="true"></td>
+                            <td contenteditable="true" inputmode="numeric"></td>
+                            <td contenteditable="true" inputmode="numeric"></td>
+                            <td contenteditable="true" inputmode="numeric"></td>
+                            <td contenteditable="true" inputmode="numeric"></td>
+                            <td contenteditable="true"></td>
+                        </tr>
+                        <tr>
+                            <td contenteditable="true" inputmode="numeric" class="aim-cell"></td>
+                            <td contenteditable="true"></td>
+                            <td contenteditable="true"></td>
+                            <td contenteditable="true"></td>
+                            <td contenteditable="true"></td>
+                            <td contenteditable="true" inputmode="numeric"></td>
+                            <td contenteditable="true" inputmode="numeric"></td>
+                            <td contenteditable="true" inputmode="numeric"></td>
+                            <td contenteditable="true" inputmode="numeric"></td>
+                            <td contenteditable="true"></td>
+                        </tr>
+                        <tr>
+                            <td contenteditable="true" inputmode="numeric" class="aim-cell"></td>
+                            <td contenteditable="true"></td>
+                            <td contenteditable="true"></td>
+                            <td contenteditable="true"></td>
+                            <td contenteditable="true"></td>
+                            <td contenteditable="true" inputmode="numeric"></td>
+                            <td contenteditable="true" inputmode="numeric"></td>
+                            <td contenteditable="true" inputmode="numeric"></td>
+                            <td contenteditable="true" inputmode="numeric"></td>
+                            <td contenteditable="true"></td>
+                        </tr>
+                        <tr>
+                            <td contenteditable="true" inputmode="numeric" class="aim-cell"></td>
+                            <td contenteditable="true"></td>
+                            <td contenteditable="true"></td>
+                            <td contenteditable="true"></td>
+                            <td contenteditable="true"></td>
+                            <td contenteditable="true" inputmode="numeric"></td>
+                            <td contenteditable="true" inputmode="numeric"></td>
+                            <td contenteditable="true" inputmode="numeric"></td>
+                            <td contenteditable="true" inputmode="numeric"></td>
+                            <td contenteditable="true"></td>
+                        </tr>
+                        <tr>
+                            <td contenteditable="true" inputmode="numeric" class="aim-cell"></td>
+                            <td contenteditable="true"></td>
+                            <td contenteditable="true"></td>
+                            <td contenteditable="true"></td>
+                            <td contenteditable="true"></td>
+                            <td contenteditable="true" inputmode="numeric"></td>
+                            <td contenteditable="true" inputmode="numeric"></td>
+                            <td contenteditable="true" inputmode="numeric"></td>
+                            <td contenteditable="true" inputmode="numeric"></td>
+                            <td contenteditable="true"></td>
+                        </tr>
+                        <tr>
+                            <td contenteditable="true" inputmode="numeric" class="aim-cell"></td>
+                            <td contenteditable="true"></td>
+                            <td contenteditable="true"></td>
+                            <td contenteditable="true"></td>
+                            <td contenteditable="true"></td>
+                            <td contenteditable="true" inputmode="numeric"></td>
+                            <td contenteditable="true" inputmode="numeric"></td>
+                            <td contenteditable="true" inputmode="numeric"></td>
+                            <td contenteditable="true" inputmode="numeric"></td>
+                            <td contenteditable="true"></td>
+                        </tr>
+                        <tr>
+                            <td contenteditable="true" inputmode="numeric" class="aim-cell"></td>
+                            <td contenteditable="true"></td>
+                            <td contenteditable="true"></td>
+                            <td contenteditable="true"></td>
+                            <td contenteditable="true"></td>
+                            <td contenteditable="true" inputmode="numeric"></td>
+                            <td contenteditable="true" inputmode="numeric"></td>
+                            <td contenteditable="true" inputmode="numeric"></td>
+                            <td contenteditable="true" inputmode="numeric"></td>
+                            <td contenteditable="true"></td>
+                        </tr>
+                        <tr>
+                            <td contenteditable="true" inputmode="numeric" class="aim-cell"></td>
+                            <td contenteditable="true"></td>
+                            <td contenteditable="true"></td>
+                            <td contenteditable="true"></td>
+                            <td contenteditable="true"></td>
+                            <td contenteditable="true" inputmode="numeric"></td>
+                            <td contenteditable="true" inputmode="numeric"></td>
+                            <td contenteditable="true" inputmode="numeric"></td>
+                            <td contenteditable="true" inputmode="numeric"></td>
+                            <td contenteditable="true"></td>
+                        </tr>
+                        <tr>
+                            <td contenteditable="true" inputmode="numeric" class="aim-cell"></td>
+                            <td contenteditable="true"></td>
+                            <td contenteditable="true"></td>
+                            <td contenteditable="true"></td>
+                            <td contenteditable="true"></td>
+                            <td contenteditable="true" inputmode="numeric"></td>
+                            <td contenteditable="true" inputmode="numeric"></td>
+                            <td contenteditable="true" inputmode="numeric"></td>
+                            <td contenteditable="true" inputmode="numeric"></td>
+                            <td contenteditable="true"></td>
+                        </tr>
+                        <tr>
+                            <td contenteditable="true" inputmode="numeric" class="aim-cell"></td>
+                            <td contenteditable="true"></td>
+                            <td contenteditable="true"></td>
+                            <td contenteditable="true"></td>
+                            <td contenteditable="true"></td>
+                            <td contenteditable="true" inputmode="numeric"></td>
+                            <td contenteditable="true" inputmode="numeric"></td>
+                            <td contenteditable="true" inputmode="numeric"></td>
+                            <td contenteditable="true" inputmode="numeric"></td>
+                            <td contenteditable="true"></td>
+                        </tr>
+                        <tr>
+                            <td contenteditable="true" inputmode="numeric" class="aim-cell"></td>
+                            <td contenteditable="true"></td>
+                            <td contenteditable="true"></td>
+                            <td contenteditable="true"></td>
+                            <td contenteditable="true"></td>
+                            <td contenteditable="true" inputmode="numeric"></td>
+                            <td contenteditable="true" inputmode="numeric"></td>
+                            <td contenteditable="true" inputmode="numeric"></td>
+                            <td contenteditable="true" inputmode="numeric"></td>
+                            <td contenteditable="true"></td>
+                        </tr>
+                        <tr>
+                            <td contenteditable="true" inputmode="numeric" class="aim-cell"></td>
+                            <td contenteditable="true"></td>
+                            <td contenteditable="true"></td>
+                            <td contenteditable="true"></td>
+                            <td contenteditable="true"></td>
+                            <td contenteditable="true" inputmode="numeric"></td>
+                            <td contenteditable="true" inputmode="numeric"></td>
+                            <td contenteditable="true" inputmode="numeric"></td>
+                            <td contenteditable="true" inputmode="numeric"></td>
+                            <td contenteditable="true"></td>
+                        </tr>
+                        <tr>
+                            <td contenteditable="true" inputmode="numeric" class="aim-cell"></td>
+                            <td contenteditable="true"></td>
+                            <td contenteditable="true"></td>
+                            <td contenteditable="true"></td>
+                            <td contenteditable="true"></td>
+                            <td contenteditable="true" inputmode="numeric"></td>
+                            <td contenteditable="true" inputmode="numeric"></td>
+                            <td contenteditable="true" inputmode="numeric"></td>
+                            <td contenteditable="true" inputmode="numeric"></td>
+                            <td contenteditable="true"></td>
+                        </tr>
+
+                        <!-- Repeat the above row 37 more times -->
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Function to enforce uppercase and ensure left-to-right typing
+        function enforceUppercase(event) {
+            const cell = event.target;
+            const originalText = cell.innerText;
+            const cursorPosition = window.getSelection().getRangeAt(0).startOffset;
+
+            cell.innerText = originalText.toUpperCase();
+
+            const range = document.createRange();
+            const selection = window.getSelection();
+            range.setStart(cell.childNodes[0], cursorPosition);
+            range.collapse(true);
+            selection.removeAllRanges();
+            selection.addRange(range);
+        }
+
+        // Function to enforce numeric input
+        function enforceNumericInput(event) {
+            const cell = event.target;
+            const originalText = cell.innerText;
+            const cursorPosition = window.getSelection().getRangeAt(0).startOffset;
+
+            const numericText = originalText.replace(/[^0-9]/g, '');
+            cell.innerText = numericText;
+
+            const range = document.createRange();
+            const selection = window.getSelection();
+            range.setStart(cell.childNodes[0], cursorPosition);
+            range.collapse(true);
+            selection.removeAllRanges();
+            selection.addRange(range);
+        }
+
+        // Function to format date in all caps (e.g., 12 JAN 2025)
+        function formatDateInCaps(date) {
+            const months = ["JAN", "FEB", "MAR", "APR", "MAY", "JUN", "JUL", "AUG", "SEP", "OCT", "NOV", "DEC"];
+            const day = date.getDate();
+            const month = months[date.getMonth()];
+            const year = date.getFullYear();
+            return `${day} ${month} ${year}`;
+        }
+
+        // Function to get the day of the week from a date
+        function getDayOfWeek(date) {
+            const days = ["SUN", "MON", "TUE", "WED", "THU", "FRI", "SAT"];
+            return days[date.getDay()];
+        }
+
+        // Function to synchronize DAY and DATE inputs
+        function synchronizeInputs() {
+            const dayInbound = document.getElementById('day-inbound');
+            const dayOutbound = document.getElementById('day-outbound');
+            const dateInbound = document.getElementById('date-inbound');
+            const dateOutbound = document.getElementById('date-outbound');
+
+            // Synchronize DAY inputs
+            dayInbound.addEventListener('change', () => {
+                dayOutbound.value = dayInbound.value;
+            });
+            dayOutbound.addEventListener('change', () => {
+                dayInbound.value = dayOutbound.value;
+            });
+
+            // Synchronize DATE inputs and update DAY dropdown
+            dateInbound.addEventListener('change', () => {
+                const selectedDate = new Date(dateInbound.value);
+                dateOutbound.value = dateInbound.value;
+                dateOutbound.nextElementSibling.textContent = formatDateInCaps(selectedDate);
+                dateInbound.nextElementSibling.textContent = formatDateInCaps(selectedDate);
+
+                const dayOfWeek = getDayOfWeek(selectedDate);
+                dayInbound.value = dayOfWeek;
+                dayOutbound.value = dayOfWeek;
+            });
+            dateOutbound.addEventListener('change', () => {
+                const selectedDate = new Date(dateOutbound.value);
+                dateInbound.value = dateOutbound.value;
+                dateInbound.nextElementSibling.textContent = formatDateInCaps(selectedDate);
+                dateOutbound.nextElementSibling.textContent = formatDateInCaps(selectedDate);
+
+                const dayOfWeek = getDayOfWeek(selectedDate);
+                dayInbound.value = dayOfWeek;
+                dayOutbound.value = dayOfWeek;
+            });
+        }
+
+        // Function to generate AIM numbers
+        function generateAIMNumbers(startValue) {
+            const aimCells = document.querySelectorAll('.aim-cell');
+            let currentValue = parseInt(startValue, 10);
+
+            aimCells.forEach((cell, index) => {
+                if (index === 0) return; // Skip the first cell
+                currentValue = (currentValue % 999) + 1;
+                cell.innerText = currentValue.toString().padStart(3, '0');
+            });
+        }
+
+        // Add event listeners to all editable cells
+        document.querySelectorAll('td[contenteditable="true"]').forEach(cell => {
+            cell.addEventListener('input', enforceUppercase);
+        });
+
+        // Add event listeners to numeric cells
+        document.querySelectorAll('td[inputmode="numeric"]').forEach(cell => {
+            cell.addEventListener('input', enforceNumericInput);
+        });
+
+        // Add event listener to the first AIM cell
+        const firstAIMCell = document.querySelector('.aim-cell');
+        firstAIMCell.addEventListener('input', (event) => {
+            const startValue = event.target.innerText;
+            if (/^\d{1,3}$/.test(startValue)) {
+                generateAIMNumbers(startValue);
+            }
+        });
+
+        // Synchronize DAY and DATE inputs on page load
+        synchronizeInputs();
+    </script>
+
+</body></html>
