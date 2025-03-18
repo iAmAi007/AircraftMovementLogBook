@@ -1324,89 +1324,275 @@ if ("serviceWorker" in navigator) {
 </script>
 
 <script>
-$(document).ready(function () {
-    let referenceData = []; // This will store the fetched data
+// Function to generate AIM numbers
+function generateAIMNumbers(startValue) {
+    const aimCells = document.querySelectorAll('.aim-cell');
+    let currentValue = parseInt(startValue, 10);
 
-    // Fetch data from predictiondata.html
-    function fetchPredictionData() {
-        axios.get('/predictiondata.html')
-            .then(response => {
-                const parser = new DOMParser();
-                const doc = parser.parseFromString(response.data, 'text/html');
-                const rows = doc.querySelectorAll('table tbody tr');
+    aimCells.forEach((cell, index) => {
+        if (index === 0) return; // Skip the first cell
+        currentValue = (currentValue % 999) + 1;
+        cell.innerText = currentValue.toString().padStart(3, '0');
+    });
+}
 
-                referenceData = [];
-                rows.forEach(row => {
-                    const cells = row.querySelectorAll('td');
-                    const rowData = Array.from(cells).map(cell => cell.innerText.trim());
-                    referenceData.push(rowData);
-                });
+// Function to auto-fill AIM column based on the first input
+function autoFillAIM(event) {
+    const firstAIMCell = event.target;
+    const input = firstAIMCell.innerText;
 
-                console.log('Fetched reference data:', referenceData);
-                initializeFeatures(); // Initialize auto-completion and prediction
-            })
-            .catch(error => {
-                console.error('Error fetching prediction data:', error);
-            });
+    if (/^\d{3}$/.test(input)) {
+        generateAIMNumbers(input); // Call the generateAIMNumbers function
     }
+}
 
-    // Auto-completion for editable cells
-    function setupAutoCompletion() {
-        // Auto-complete for "FROM" and "DEST" cells
-        $('.from-cell, .dest-cell').on('input', function (event) {
-            const input = $(this).text().toUpperCase();
-            const columnIndex = $(this).hasClass('from-cell') ? 3 : 4; // Assuming "FROM" is the 4th column and "DEST" is the 5th
+// Function to enforce uppercase and ensure left-to-right typing
+function enforceUppercase(event) {
+    const cell = event.target;
+    const originalText = cell.innerText;
+    const cursorPosition = window.getSelection().getRangeAt(0).startOffset;
 
-            // Find matching data
-            const matchingData = referenceData.filter(row => row[columnIndex] && row[columnIndex].startsWith(input));
+    cell.innerText = originalText.toUpperCase();
 
-            if (matchingData.length > 0) {
-                // Auto-complete the cell with the first matching value
-                $(this).text(matchingData[0][columnIndex]);
+    const range = document.createRange();
+    const selection = window.getSelection();
+    range.setStart(cell.childNodes[0], cursorPosition);
+    range.collapse(true);
+    selection.removeAllRanges();
+    selection.addRange(range);
+}
+
+// Function to enforce numeric input
+function enforceNumericInput(event) {
+    const cell = event.target;
+    const originalText = cell.innerText;
+    const cursorPosition = window.getSelection().getRangeAt(0).startOffset;
+
+    const numericText = originalText.replace(/[^0-9]/g, '');
+    cell.innerText = numericText;
+
+    const range = document.createRange();
+    const selection = window.getSelection();
+    range.setStart(cell.childNodes[0], cursorPosition);
+    range.collapse(true);
+    selection.removeAllRanges();
+    selection.addRange(range);
+}
+
+// Function to validate FROM and DEST columns (strictly four alphabets)
+function validateFourAlphabets(event) {
+    const cell = event.target;
+    const input = cell.innerText.toUpperCase();
+
+    if (input.length !== 4 || !/^[A-Z]{4}$/.test(input)) {
+        cell.innerText = ''; // Clear invalid input
+    }
+}
+
+// Function to validate SKED, ATC, ETA, EET, ETA EDZ, EOBT, and ATD columns (strictly four numeric characters, 0000–2359)
+function validateFourNumeric(event) {
+    const cell = event.target;
+    const input = cell.innerText;
+
+    if (input.length !== 4 || !/^\d{4}$/.test(input) || parseInt(input) < 0 || parseInt(input) > 2359) {
+        cell.innerText = ''; // Clear invalid input
+    }
+}
+
+// Function to auto-complete AIM column (one/two digits to three digits)
+function autoCompleteAIM(event) {
+    const cell = event.target;
+    const input = cell.innerText;
+
+    if (/^\d{1,2}$/.test(input)) {
+        cell.innerText = input.padStart(3, '0'); // Auto-complete to three digits
+    } else if (!/^\d{3}$/.test(input)) {
+        cell.innerText = ''; // Clear invalid input
+    }
+}
+
+// Function to add collapse/expand icons
+function addCollapseExpandIcons() {
+    const inboundHeader = document.querySelector('.table-header h2');
+    const outboundHeader = document.querySelectorAll('.table-header h2')[1];
+
+    // Inbound Table Icon
+    const inboundIcon = document.createElement('span');
+    inboundIcon.innerText = '-';
+    inboundIcon.style.cursor = 'pointer';
+    inboundIcon.style.marginRight = '10px';
+    inboundHeader.prepend(inboundIcon);
+
+    // Outbound Table Icon
+    const outboundIcon = document.createElement('span');
+    outboundIcon.innerText = '-';
+    outboundIcon.style.cursor = 'pointer';
+    outboundIcon.style.marginRight = '10px';
+    outboundHeader.prepend(outboundIcon);
+
+    // Toggle Inbound Table
+    inboundIcon.addEventListener('click', () => {
+        const table = inboundHeader.closest('div').querySelector('table');
+        if (table.style.display === 'none') {
+            table.style.display = 'table';
+            inboundIcon.innerText = '-';
+        } else {
+            table.style.display = 'none';
+            inboundIcon.innerText = '+';
+        }
+    });
+
+    // Toggle Outbound Table
+    outboundIcon.addEventListener('click', () => {
+        const table = outboundHeader.closest('div').querySelector('table');
+        if (table.style.display === 'none') {
+            table.style.display = 'table';
+            outboundIcon.innerText = '-';
+        } else {
+            table.style.display = 'none';
+            outboundIcon.innerText = '+';
+        }
+    });
+}
+
+// Function to add rows
+function addRows() {
+    const tables = document.querySelectorAll('table');
+
+    tables.forEach(table => {
+        const addRowButton = document.createElement('button');
+        addRowButton.innerText = '+';
+        addRowButton.style.cursor = 'pointer';
+        addRowButton.style.marginTop = '10px';
+        table.parentElement.appendChild(addRowButton);
+
+        addRowButton.addEventListener('click', () => {
+            const tbody = table.querySelector('tbody');
+            for (let i = 0; i < 5; i++) { // Append 5 rows
+                const newRow = tbody.insertRow();
+
+                for (let j = 0; j < tbody.rows[0].cells.length; j++) {
+                    const newCell = newRow.insertCell();
+                    newCell.contentEditable = true;
+
+                    if (tbody.rows[0].cells[j].classList.contains('aim-cell')) {
+                        newCell.classList.add('aim-cell');
+                        newCell.addEventListener('input', autoCompleteAIM);
+                    } else if (tbody.rows[0].cells[j].getAttribute('inputmode') === 'numeric') {
+                        newCell.setAttribute('inputmode', 'numeric');
+                        newCell.addEventListener('input', enforceNumericInput);
+                    } else {
+                        newCell.addEventListener('input', enforceUppercase);
+                    }
+                }
             }
         });
+    });
+}
 
-        // Auto-complete for other editable cells
-        $('td[contenteditable="true"]').not('.from-cell, .dest-cell').on('input', function (event) {
-            const input = $(this).text().toUpperCase();
-            const columnIndex = $(this).index(); // Get the column index
+// Function to set the current date and time
+function setCurrentDate() {
+    const currentDate = new Date();
+    const formattedDate = currentDate.toISOString().split('T')[0]; // YYYY-MM-DD format
 
-            // Find matching data
-            const matchingData = referenceData.filter(row => row[columnIndex] && row[columnIndex].startsWith(input));
+    const dateInbound = document.getElementById('date-inbound');
+    const dateOutbound = document.getElementById('date-outbound');
 
-            if (matchingData.length > 0) {
-                // Auto-complete the cell with the first matching value
-                $(this).text(matchingData[0][columnIndex]);
-            }
-        });
-    }
+    dateInbound.value = formattedDate;
+    dateOutbound.value = formattedDate;
 
-    // Prediction for numeric fields (e.g., ETA, EET, etc.)
-    function setupPrediction() {
-        $('td[inputmode="numeric"]').not('.pob-cell, .fr-cell').on('blur', function (event) {
-            const input = $(this).text();
-            const columnIndex = $(this).index(); // Get the column index
+    const dayInbound = document.getElementById('day-inbound');
+    const dayOutbound = document.getElementById('day-outbound');
 
-            // Find matching data
-            const matchingData = referenceData.filter(row => row[columnIndex] && row[columnIndex].startsWith(input));
+    const dayOfWeek = getDayOfWeek(currentDate);
+    dayInbound.value = dayOfWeek;
+    dayOutbound.value = dayOfWeek;
+}
 
-            if (matchingData.length > 0) {
-                // Predict the value based on the average of matching data
-                const averageValue = matchingData.reduce((sum, row) => sum + parseInt(row[columnIndex], 10), 0) / matchingData.length;
-                $(this).text(Math.round(averageValue).toString().padStart(4, '0')); // Format as 4 digits
-            }
-        });
-    }
+// Function to get the day of the week from a date
+function getDayOfWeek(date) {
+    const days = ["SUN", "MON", "TUE", "WED", "THU", "FRI", "SAT"];
+    return days[date.getDay()];
+}
 
-    // Initialize auto-completion and prediction
-    function initializeFeatures() {
-        setupAutoCompletion();
-        setupPrediction();
-    }
+// Function to synchronize DAY and DATE inputs
+function synchronizeInputs() {
+    const dayInbound = document.getElementById('day-inbound');
+    const dayOutbound = document.getElementById('day-outbound');
+    const dateInbound = document.getElementById('date-inbound');
+    const dateOutbound = document.getElementById('date-outbound');
 
-    // Fetch data and initialize features when the page loads
-    fetchPredictionData();
+    // Synchronize DAY inputs
+    dayInbound.addEventListener('change', () => {
+        dayOutbound.value = dayInbound.value;
+    });
+    dayOutbound.addEventListener('change', () => {
+        dayInbound.value = dayOutbound.value;
+    });
+
+    // Synchronize DATE inputs and update DAY dropdown
+    dateInbound.addEventListener('change', () => {
+        const selectedDate = new Date(dateInbound.value);
+        dateOutbound.value = dateInbound.value;
+        const dayOfWeek = getDayOfWeek(selectedDate);
+        dayInbound.value = dayOfWeek;
+        dayOutbound.value = dayOfWeek;
+    });
+    dateOutbound.addEventListener('change', () => {
+        const selectedDate = new Date(dateOutbound.value);
+        dateInbound.value = dateOutbound.value;
+        const dayOfWeek = getDayOfWeek(selectedDate);
+        dayInbound.value = dayOfWeek;
+        dayOutbound.value = dayOfWeek;
+    });
+}
+
+// Add event listeners to all editable cells
+document.querySelectorAll('td[contenteditable="true"]').forEach(cell => {
+    cell.addEventListener('input', enforceUppercase);
 });
+
+// Add event listeners to numeric cells
+document.querySelectorAll('td[inputmode="numeric"]').forEach(cell => {
+    cell.addEventListener('input', enforceNumericInput);
+});
+
+// Add event listeners to FROM and DEST cells
+document.querySelectorAll('.from-cell, .dest-cell').forEach(cell => {
+    cell.addEventListener('blur', validateFourAlphabets);
+});
+
+// Add event listeners to SKED, ATC, ETA, EET, ETA EDZ, EOBT, and ATD cells
+document.querySelectorAll('td[inputmode="numeric"]').forEach(cell => {
+    cell.addEventListener('blur', validateFourNumeric);
+});
+
+// Add event listener to AIM cells
+const firstAIMCell = document.querySelector('.aim-cell');
+firstAIMCell.addEventListener('blur', autoFillAIM);
+
+// Add collapse/expand icons
+addCollapseExpandIcons();
+
+// Add rows functionality
+addRows();
+
+// Set the current date and time on page load
+setCurrentDate();
+
+// Synchronize DAY and DATE inputs on page load
+synchronizeInputs();
+
+// Register the Service Worker
+if ("serviceWorker" in navigator) {
+    navigator.serviceWorker.register("/sw.js")
+        .then((registration) => {
+            console.log("Service Worker registered with scope:", registration.scope);
+        })
+        .catch((error) => {
+            console.error("Service Worker registration failed:", error);
+        });
+}
 </script>
 
 
