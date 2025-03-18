@@ -1,0 +1,1321 @@
+<!DOCTYPE html>
+<!-- saved from url=(0048)file:///C:/Users/albri/Downloads/commonData.html -->
+<html lang="en"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Aircraft Table</title>
+    <!-- Link the Web App Manifest -->
+    <link rel="manifest" href="file:///C:/manifest.json">
+    <!-- Add theme color for PWA -->
+    <meta name="theme-color" content="#2c5175">
+    <!-- Add iOS support -->
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <!-- Your existing styles -->
+    <style>
+        @font-face {
+            font-family: 'SF Pro Display';
+            src: url('SFPRODISPLAY-REGULAR.TTF') format('truetype');
+            font-weight: normal;
+            letter-spacing: 1px;
+            font-style: normal;
+        }
+        @font-face {
+            font-family: 'SF Pro Display';
+            src: url('SFProDisplay-Bold.ttf') format('truetype');
+            font-weight: 700;
+            letter-spacing: 1px;
+            font-style: normal;
+        }
+        body {
+            font-family: 'SF Pro Display';
+            margin: 20px;
+            overflow-x: auto;
+            display: flex;
+            justify-content: center; /* Center horizontally */
+            min-height: 100vh; /* Ensure the body takes up the full viewport height */
+            align-items: flex-start; /* Align content to the top (remove vertical centering) */
+        }
+        .table-container {
+            display: flex;
+            gap: 20px;
+            width: max-content;
+            margin: 0 auto; /* Center horizontally within the flex container */
+        }
+        table {
+            border-collapse: collapse;
+            table-layout: auto;
+            min-width: 800px;
+        }
+        thead {
+            border-top: 1px solid #2c5175;
+            border-bottom: 1px solid #2c5175;
+        }
+        tbody {
+            border-bottom: 1px solid #2c5175;
+        }
+        th {
+            text-align: left;
+            font-size: 16px;
+            font-weight: 700;
+            padding: 10px 5px;
+            color: #2c5175;
+            background-color: #FFFFFF;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+        td {
+            padding: 10px 5px;
+            font-size: 16px;
+            color: #2c5175;
+            letter-spacing: 0.5px;
+        }
+        tr:nth-child(odd) {
+            background-color: #EAF3FB;
+        }
+        tr:nth-child(even) {
+            background-color: #FFFFFF;
+        }
+        th, td {
+            border: none;
+        }
+        td[contenteditable="true"]:focus {
+            outline: 2px solid #2c5175;
+            background-color: #f0f8ff;
+        }
+        .slider {
+            width: 100%;
+            overflow-x: auto;
+            margin-top: 20px;
+        }
+        .table-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 10px;
+        }
+        .table-header h2 {
+            font-size: 16px;
+            font-weight: bold;
+            color: #2c5175;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin: 0;
+        }
+        .table-header .header-input {
+            display: flex;
+            align-items: center;
+            gap: 10px; /* Adjust the gap between elements */
+        }
+        /* Add margin to the DAY dropdown */
+        .table-header .header-input select {
+            margin-right: 20px; /* Move the DAY dropdown to the left */
+        }
+        .table-header select,
+        .table-header input[type="date"] {
+            font-family: 'SF Pro Display', sans-serif; /* Use the same font as the rest of the app */
+            font-size: 16px; /* Match the font size of the DAY dropdown */
+            color: #2c5175; /* Match the text color */
+            text-transform: uppercase; /* Match the text style */
+            font-weight: bold; /* Match the font weight */
+            border: none; /* Remove default border */
+            background: transparent; /* Match the background */
+            padding: 5px; /* Match the padding */
+            cursor: pointer; /* Show pointer cursor */
+        }
+        .table-header select:focus,
+        .table-header input[type="date"]:focus {
+            outline: none;
+        }
+        .table-header select option[disabled] {
+            color: #999;
+        }
+        .date-input-container {
+            position: relative;
+            display: inline-block;
+        }
+        .date-input-container input[type="date"] {
+            opacity: 1; /* Make the input visible */
+            position: relative; /* Change from absolute to relative */
+            width: auto; /* Allow the input to take its natural width */
+            height: auto; /* Allow the input to take its natural height */
+            cursor: pointer;
+        }
+        .date-input-container .date-placeholder {
+            display: none; /* Hide the placeholder since the input is now visible */
+        }
+    </style>
+</head>
+<body>
+    <div class="slider">
+        <div class="table-container">
+            <!-- Left Table Section (INBOUND TFC) -->
+            <div>
+                <div class="table-header">
+                    <h2><span style="cursor: pointer; margin-right: 10px;"></span>INBOUND TFC</h2>
+                    <div class="header-input">
+                        <!-- DAY Dropdown -->
+                        <select id="day-inbound">
+                            <option value="MON">MON</option>
+                            <option value="TUE">TUE</option>
+                            <option value="WED">WED</option>
+                            <option value="THU">THU</option>
+                            <option value="FRI">FRI</option>
+                            <option value="SAT">SAT</option>
+                            <option value="SUN">SUN</option>
+                        </select>
+                        <!-- DATE Picker -->
+                        <div class="date-input-container">
+                            <input type="date" id="date-inbound">
+                            <!-- Remove the placeholder since the input is now visible -->
+                        </div>
+                    </div>
+                </div>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>SVC</th>
+                            <th>REG</th>
+                            <th>TYPE</th>
+                            <th>FROM</th>
+                            <th>SKED</th>
+                            <th>ATC ETA</th>
+                            <th>PLN</th>
+                            <th>EET</th>
+                            <th>ETA EDZ</th>
+                            <th>REMARKS</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <!-- Two rows for INBOUND TFC -->
+                        <tr>
+                            <td contenteditable="true">ATC405</td>
+                            <td contenteditable="true">5HTCP</td>
+                            <td contenteditable="true">B39M</td>
+                            <td contenteditable="true" class="from-cell">OMDB</td>
+                            <td contenteditable="true" inputmode="numeric">0500</td>
+                            <td contenteditable="true" inputmode="numeric"></td>
+                            <td contenteditable="true"></td>
+                            <td contenteditable="true" inputmode="numeric"></td>
+                            <td contenteditable="true" inputmode="numeric"></td>
+                            <td contenteditable="true"></td>
+                        </tr>
+                        <tr>
+                            <td contenteditable="true">ATC401</td>
+                            <td contenteditable="true">5HTCR</td>
+                            <td contenteditable="true">B788</td>
+                            <td contenteditable="true" class="from-cell">VABB</td>
+                            <td contenteditable="true" inputmode="numeric">0620</td>
+                            <td contenteditable="true" inputmode="numeric"></td>
+                            <td contenteditable="true"></td>
+                            <td contenteditable="true" inputmode="numeric"></td>
+                            <td contenteditable="true" inputmode="numeric"></td>
+                            <td contenteditable="true"></td>
+                        </tr>
+                        <tr>
+                            <td contenteditable="true">ATC111</td>
+                            <td contenteditable="true">5HTCI</td>
+                            <td contenteditable="true">BC33</td>
+                            <td contenteditable="true" class="from-cell">HTMW</td>
+                            <td contenteditable="true" inputmode="numeric">0600</td>
+                            <td contenteditable="true" inputmode="numeric"></td>
+                            <td contenteditable="true"></td>
+                            <td contenteditable="true" inputmode="numeric"></td>
+                            <td contenteditable="true" inputmode="numeric"></td>
+                            <td contenteditable="true"></td>
+                        </tr>
+                        <tr>
+                            <td contenteditable="true">ATC201</td>
+                            <td contenteditable="true">5HTCE</td>
+                            <td contenteditable="true">DH8D</td>
+                            <td contenteditable="true" class="from-cell">HKJK</td>
+                            <td contenteditable="true" inputmode="numeric">0540</td>
+                            <td contenteditable="true" inputmode="numeric"></td>
+                            <td contenteditable="true"></td>
+                            <td contenteditable="true" inputmode="numeric"></td>
+                            <td contenteditable="true" inputmode="numeric"></td>
+                            <td contenteditable="true"></td>
+                        </tr>
+                        <tr>
+                            <td contenteditable="true">ATC113</td>
+                            <td contenteditable="true">5HTCK</td>
+                            <td contenteditable="true">DH8D</td>
+                            <td contenteditable="true" class="from-cell">HTIR</td>
+                            <td contenteditable="true" inputmode="numeric">0850</td>
+                            <td contenteditable="true" inputmode="numeric"></td>
+                            <td contenteditable="true"></td>
+                            <td contenteditable="true" inputmode="numeric"></td>
+                            <td contenteditable="true" inputmode="numeric"></td>
+                            <td contenteditable="true"></td>
+                        </tr>
+                        <tr>
+                            <td contenteditable="true">ATC109</td>
+                            <td contenteditable="true">5HTCK</td>
+                            <td contenteditable="true">DH8D</td>
+                            <td contenteditable="true" class="from-cell">HTDO</td>
+                            <td contenteditable="true" inputmode="numeric">0600</td>
+                            <td contenteditable="true" inputmode="numeric"></td>
+                            <td contenteditable="true"></td>
+                            <td contenteditable="true" inputmode="numeric"></td>
+                            <td contenteditable="true" inputmode="numeric"></td>
+                            <td contenteditable="true"></td>
+                        </tr>
+                        <tr>
+                            <td contenteditable="true">ATC117</td>
+                            <td contenteditable="true">5HTCD</td>
+                            <td contenteditable="true">DH8D</td>
+                            <td contenteditable="true" class="from-cell">HTGW</td>
+                            <td contenteditable="true" inputmode="numeric">0910</td>
+                            <td contenteditable="true" inputmode="numeric"></td>
+                            <td contenteditable="true"></td>
+                            <td contenteditable="true" inputmode="numeric"></td>
+                            <td contenteditable="true" inputmode="numeric"></td>
+                            <td contenteditable="true"></td>
+                        </tr>
+                        <tr>
+                            <td contenteditable="true">ATC157</td>
+                            <td contenteditable="true">5HTCB</td>
+                            <td contenteditable="true">DH8D</td>
+                            <td contenteditable="true" class="from-cell">HTZA</td>
+                            <td contenteditable="true" inputmode="numeric">0710</td>
+                            <td contenteditable="true" inputmode="numeric"></td>
+                            <td contenteditable="true"></td>
+                            <td contenteditable="true" inputmode="numeric"></td>
+                            <td contenteditable="true" inputmode="numeric"></td>
+                            <td contenteditable="true"></td>
+                        </tr>
+                        <tr>
+                            <td contenteditable="true">ATC133</td>
+                            <td contenteditable="true">5HTCB</td>
+                            <td contenteditable="true">DH8D</td>
+                            <td contenteditable="true" class="from-cell">HTSO</td>
+                            <td contenteditable="true" inputmode="numeric">1140</td>
+                            <td contenteditable="true" inputmode="numeric"></td>
+                            <td contenteditable="true"></td>
+                            <td contenteditable="true" inputmode="numeric"></td>
+                            <td contenteditable="true" inputmode="numeric"></td>
+                            <td contenteditable="true"></td>
+                        </tr>
+                        <tr>
+                            <td contenteditable="true">ATC219</td>
+                            <td contenteditable="true">5HTCE</td>
+                            <td contenteditable="true">DH8D</td>
+                            <td contenteditable="true" class="from-cell">HTKA</td>
+                            <td contenteditable="true" inputmode="numeric">1450</td>
+                            <td contenteditable="true" inputmode="numeric"></td>
+                            <td contenteditable="true"></td>
+                            <td contenteditable="true" inputmode="numeric"></td>
+                            <td contenteditable="true" inputmode="numeric"></td>
+                            <td contenteditable="true"></td>
+                        </tr>
+                        <tr>
+                            <td contenteditable="true">ATC209</td>
+                            <td contenteditable="true">5HTCQ</td>
+                            <td contenteditable="true">B39M</td>
+                            <td contenteditable="true" class="from-cell">FAOR</td>
+                            <td contenteditable="true" inputmode="numeric">1500</td>
+                            <td contenteditable="true" inputmode="numeric"></td>
+                            <td contenteditable="true"></td>
+                            <td contenteditable="true" inputmode="numeric"></td>
+                            <td contenteditable="true" inputmode="numeric"></td>
+                            <td contenteditable="true"></td>
+                        </tr>
+                        <tr>
+                            <td contenteditable="true">ATC215</td>
+                            <td contenteditable="true">5HTCI</td>
+                            <td contenteditable="true">BCS3</td>
+                            <td contenteditable="true" class="from-cell">HTKJ</td>
+                            <td contenteditable="true" inputmode="numeric">1540</td>
+                            <td contenteditable="true" inputmode="numeric"></td>
+                            <td contenteditable="true"></td>
+                            <td contenteditable="true" inputmode="numeric"></td>
+                            <td contenteditable="true" inputmode="numeric"></td>
+                            <td contenteditable="true"></td>
+                        </tr>
+                        <tr>
+                            <td contenteditable="true">ATC213</td>
+                            <td contenteditable="true">5HTCP</td>
+                            <td contenteditable="true">B39M</td>
+                            <td contenteditable="true" class="from-cell">FZQA</td>
+                            <td contenteditable="true" inputmode="numeric">1505</td>
+                            <td contenteditable="true" inputmode="numeric"></td>
+                            <td contenteditable="true"></td>
+                            <td contenteditable="true" inputmode="numeric"></td>
+                            <td contenteditable="true" inputmode="numeric"></td>
+                            <td contenteditable="true"></td>
+                        </tr>
+                        <tr>
+                            <td contenteditable="true">ATC137</td>
+                            <td contenteditable="true">5HTCD</td>
+                            <td contenteditable="true">DH8D</td>
+                            <td contenteditable="true" class="from-cell">HTZA</td>
+                            <td contenteditable="true" inputmode="numeric">1540</td>
+                            <td contenteditable="true" inputmode="numeric"></td>
+                            <td contenteditable="true"></td>
+                            <td contenteditable="true" inputmode="numeric"></td>
+                            <td contenteditable="true" inputmode="numeric"></td>
+                            <td contenteditable="true"></td>
+                        </tr>
+                        <tr>
+                            <td contenteditable="true">ATC119</td>
+                            <td contenteditable="true">5HTCE</td>
+                            <td contenteditable="true">DH8D</td>
+                            <td contenteditable="true" class="from-cell">HTDO</td>
+                            <td contenteditable="true" inputmode="numeric">1940</td>
+                            <td contenteditable="true" inputmode="numeric"></td>
+                            <td contenteditable="true"></td>
+                            <td contenteditable="true" inputmode="numeric"></td>
+                            <td contenteditable="true" inputmode="numeric"></td>
+                            <td contenteditable="true"></td>
+                        </tr>
+                        <tr>
+                            <td contenteditable="true">ATC107</td>
+                            <td contenteditable="true">5HTCK</td>
+                            <td contenteditable="true">DH8D</td>
+                            <td contenteditable="true" class="from-cell">HTGW</td>
+                            <td contenteditable="true" inputmode="numeric">1750</td>
+                            <td contenteditable="true" inputmode="numeric"></td>
+                            <td contenteditable="true"></td>
+                            <td contenteditable="true" inputmode="numeric"></td>
+                            <td contenteditable="true" inputmode="numeric"></td>
+                            <td contenteditable="true"></td>
+                        </tr>
+                        <tr>
+                            <td contenteditable="true">ATC203</td>
+                            <td contenteditable="true">5HTCD</td>
+                            <td contenteditable="true">DH8D</td>
+                            <td contenteditable="true" class="from-cell">HKJK</td>
+                            <td contenteditable="true" inputmode="numeric">2220</td>
+                            <td contenteditable="true" inputmode="numeric"></td>
+                            <td contenteditable="true"></td>
+                            <td contenteditable="true" inputmode="numeric"></td>
+                            <td contenteditable="true" inputmode="numeric"></td>
+                            <td contenteditable="true"></td>
+                        </tr>
+                        <tr>
+                            <td contenteditable="true">ATC125</td>
+                            <td contenteditable="true">5HTCM</td>
+                            <td contenteditable="true">BCS3</td>
+                            <td contenteditable="true" class="from-cell">HTZA</td>
+                            <td contenteditable="true" inputmode="numeric">2300</td>
+                            <td contenteditable="true" inputmode="numeric"></td>
+                            <td contenteditable="true"></td>
+                            <td contenteditable="true" inputmode="numeric"></td>
+                            <td contenteditable="true" inputmode="numeric"></td>
+                            <td contenteditable="true"></td>
+                        </tr>
+                        <tr>
+                            <td contenteditable="true">ATC103</td>
+                            <td contenteditable="true">5HTCQ</td>
+                            <td contenteditable="true">B39M</td>
+                            <td contenteditable="true" class="from-cell">HTMW</td>
+                            <td contenteditable="true" inputmode="numeric">2200</td>
+                            <td contenteditable="true" inputmode="numeric"></td>
+                            <td contenteditable="true"></td>
+                            <td contenteditable="true" inputmode="numeric"></td>
+                            <td contenteditable="true" inputmode="numeric"></td>
+                            <td contenteditable="true"></td>
+                        </tr>
+                        <tr>
+                            <td contenteditable="true">KQA488</td>
+                            <td contenteditable="true">5Y</td>
+                            <td contenteditable="true">E190</td>
+                            <td contenteditable="true" class="from-cell">HKJK</td>
+                            <td contenteditable="true" inputmode="numeric">0000</td>
+                            <td contenteditable="true" inputmode="numeric"></td>
+                            <td contenteditable="true"></td>
+                            <td contenteditable="true" inputmode="numeric"></td>
+                            <td contenteditable="true" inputmode="numeric"></td>
+                            <td contenteditable="true"></td>
+                        </tr>
+                        <tr>
+                            <td contenteditable="true">THY603</td>
+                            <td contenteditable="true">TC</td>
+                            <td contenteditable="true">B737</td>
+                            <td contenteditable="true" class="from-cell">LTFM</td>
+                            <td contenteditable="true" inputmode="numeric">0015</td>
+                            <td contenteditable="true" inputmode="numeric"></td>
+                            <td contenteditable="true"></td>
+                            <td contenteditable="true" inputmode="numeric"></td>
+                            <td contenteditable="true" inputmode="numeric"></td>
+                            <td contenteditable="true"></td>
+                        </tr>
+                        <tr>
+                            <td contenteditable="true">ETH827</td>
+                            <td contenteditable="true">ET</td>
+                            <td contenteditable="true">B737</td>
+                            <td contenteditable="true" class="from-cell">HAAB</td>
+                            <td contenteditable="true" inputmode="numeric">0015</td>
+                            <td contenteditable="true" inputmode="numeric"></td>
+                            <td contenteditable="true"></td>
+                            <td contenteditable="true" inputmode="numeric"></td>
+                            <td contenteditable="true" inputmode="numeric"></td>
+                            <td contenteditable="true"></td>
+                        </tr>
+                        <tr>
+                            <td contenteditable="true">KQA482</td>
+                            <td contenteditable="true">5Y</td>
+                            <td contenteditable="true">E190</td>
+                            <td contenteditable="true" class="from-cell">HKJK</td>
+                            <td contenteditable="true" inputmode="numeric">0605</td>
+                            <td contenteditable="true" inputmode="numeric"></td>
+                            <td contenteditable="true"></td>
+                            <td contenteditable="true" inputmode="numeric"></td>
+                            <td contenteditable="true" inputmode="numeric"></td>
+                            <td contenteditable="true"></td>
+                        </tr>
+                        <tr>
+                            <td contenteditable="true">QTR1499</td>
+                            <td contenteditable="true">A7</td>
+                            <td contenteditable="true">A330</td>
+                            <td contenteditable="true" class="from-cell">HTKJ</td>
+                            <td contenteditable="true" inputmode="numeric">0715</td>
+                            <td contenteditable="true" inputmode="numeric"></td>
+                            <td contenteditable="true"></td>
+                            <td contenteditable="true" inputmode="numeric"></td>
+                            <td contenteditable="true" inputmode="numeric"></td>
+                            <td contenteditable="true"></td>
+                        </tr>
+                        <tr>
+                            <td contenteditable="true">ETH805</td>
+                            <td contenteditable="true">ET</td>
+                            <td contenteditable="true">B787</td>
+                            <td contenteditable="true" class="from-cell">HAAB</td>
+                            <td contenteditable="true" inputmode="numeric">0830</td>
+                            <td contenteditable="true" inputmode="numeric"></td>
+                            <td contenteditable="true"></td>
+                            <td contenteditable="true" inputmode="numeric"></td>
+                            <td contenteditable="true" inputmode="numeric"></td>
+                            <td contenteditable="true"></td>
+                        </tr>
+                        <tr>
+                            <td contenteditable="true">AZB504</td>
+                            <td contenteditable="true">ET</td>
+                            <td contenteditable="true">B737</td>
+                            <td contenteditable="true" class="from-cell">HKJK</td>
+                            <td contenteditable="true" inputmode="numeric">1035</td>
+                            <td contenteditable="true" inputmode="numeric"></td>
+                            <td contenteditable="true"></td>
+                            <td contenteditable="true" inputmode="numeric"></td>
+                            <td contenteditable="true" inputmode="numeric"></td>
+                            <td contenteditable="true"></td>
+                        </tr>
+                        <tr>
+                            <td contenteditable="true">LAM460</td>
+                            <td contenteditable="true">C9</td>
+                            <td contenteditable="true">CRJ9</td>
+                            <td contenteditable="true" class="from-cell">FQPB</td>
+                            <td contenteditable="true" inputmode="numeric">1025</td>
+                            <td contenteditable="true" inputmode="numeric"></td>
+                            <td contenteditable="true"></td>
+                            <td contenteditable="true" inputmode="numeric"></td>
+                            <td contenteditable="true" inputmode="numeric"></td>
+                            <td contenteditable="true"></td>
+                        </tr>
+                        <tr>
+                            <td contenteditable="true">AZW438</td>
+                            <td contenteditable="true">Z</td>
+                            <td contenteditable="true">E145</td>
+                            <td contenteditable="true" class="from-cell">FVRG</td>
+                            <td contenteditable="true" inputmode="numeric">1045</td>
+                            <td contenteditable="true" inputmode="numeric"></td>
+                            <td contenteditable="true"></td>
+                            <td contenteditable="true" inputmode="numeric"></td>
+                            <td contenteditable="true" inputmode="numeric"></td>
+                            <td contenteditable="true"></td>
+                        </tr>
+                        <tr>
+                            <td contenteditable="true">QTR1476</td>
+                            <td contenteditable="true">A7</td>
+                            <td contenteditable="true">A330</td>
+                            <td contenteditable="true" class="from-cell">OTHH</td>
+                            <td contenteditable="true" inputmode="numeric">1055</td>
+                            <td contenteditable="true" inputmode="numeric"></td>
+                            <td contenteditable="true"></td>
+                            <td contenteditable="true" inputmode="numeric"></td>
+                            <td contenteditable="true" inputmode="numeric"></td>
+                            <td contenteditable="true"></td>
+                        </tr>
+                        <tr>
+                            <td contenteditable="true">UAE725</td>
+                            <td contenteditable="true">A6</td>
+                            <td contenteditable="true">B773</td>
+                            <td contenteditable="true" class="from-cell">OMDB</td>
+                            <td contenteditable="true" inputmode="numeric">1040</td>
+                            <td contenteditable="true" inputmode="numeric"></td>
+                            <td contenteditable="true"></td>
+                            <td contenteditable="true" inputmode="numeric"></td>
+                            <td contenteditable="true" inputmode="numeric"></td>
+                            <td contenteditable="true"></td>
+                        </tr>
+
+                    <tr><td contenteditable="true">LNK032</td><td contenteditable="true">ZS</td><td contenteditable="true">E190</td><td contenteditable="true">FAOR</td><td contenteditable="true" inputmode="numeric">1110</td><td contenteditable="true" inputmode="numeric"></td><td contenteditable="true"></td><td contenteditable="true" inputmode="numeric"></td><td contenteditable="true" inputmode="numeric"></td><td contenteditable="true"></td></tr><tr><td contenteditable="true">KQA484</td><td contenteditable="true">5Y</td><td contenteditable="true">E190</td><td contenteditable="true">HKJK</td><td contenteditable="true" inputmode="numeric">1115</td><td contenteditable="true" inputmode="numeric"></td><td contenteditable="true"></td><td contenteditable="true" inputmode="numeric"></td><td contenteditable="true" inputmode="numeric"></td><td contenteditable="true"></td></tr><tr><td contenteditable="true">OMA705</td><td contenteditable="true">A4O</td><td contenteditable="true">B737</td><td contenteditable="true">HTZA</td><td contenteditable="true" inputmode="numeric">1215</td><td contenteditable="true" inputmode="numeric"></td><td contenteditable="true"></td><td contenteditable="true" inputmode="numeric"></td><td contenteditable="true" inputmode="numeric"></td><td contenteditable="true"></td></tr><tr><td contenteditable="true">RWD442</td><td contenteditable="true">9XR</td><td contenteditable="true">DH8D</td><td contenteditable="true">HRYR</td><td contenteditable="true" inputmode="numeric">1250</td><td contenteditable="true" inputmode="numeric"></td><td contenteditable="true"></td><td contenteditable="true" inputmode="numeric"></td><td contenteditable="true" inputmode="numeric"></td><td contenteditable="true"></td></tr><tr><td contenteditable="true">FDB1687</td><td contenteditable="true">A6</td><td contenteditable="true">B38M</td><td contenteditable="true">HTZA</td><td contenteditable="true" inputmode="numeric">1305</td><td contenteditable="true" inputmode="numeric"></td><td contenteditable="true"></td><td contenteditable="true" inputmode="numeric"></td><td contenteditable="true" inputmode="numeric"></td><td contenteditable="true"></td></tr><tr><td contenteditable="true">UGD320</td><td contenteditable="true">5X</td><td contenteditable="true">CRJ9</td><td contenteditable="true">HUEN</td><td contenteditable="true" inputmode="numeric">1350</td><td contenteditable="true" inputmode="numeric"></td><td contenteditable="true"></td><td contenteditable="true" inputmode="numeric"></td><td contenteditable="true" inputmode="numeric"></td><td contenteditable="true"></td></tr><tr><td contenteditable="true">ETH803</td><td contenteditable="true">ET</td><td contenteditable="true">B737</td><td contenteditable="true">HAAB</td><td contenteditable="true" inputmode="numeric">1455</td><td contenteditable="true" inputmode="numeric"></td><td contenteditable="true"></td><td contenteditable="true" inputmode="numeric"></td><td contenteditable="true" inputmode="numeric"></td><td contenteditable="true"></td></tr><tr><td contenteditable="true">KQA486</td><td contenteditable="true">5Y</td><td contenteditable="true">E190</td><td contenteditable="true">HKJK</td><td contenteditable="true" inputmode="numeric">1655</td><td contenteditable="true" inputmode="numeric"></td><td contenteditable="true"></td><td contenteditable="true" inputmode="numeric"></td><td contenteditable="true" inputmode="numeric"></td><td contenteditable="true"></td></tr><tr><td contenteditable="true">MWI042</td><td contenteditable="true">ET</td><td contenteditable="true">DH8D</td><td contenteditable="true">FWCL</td><td contenteditable="true" inputmode="numeric">1710</td><td contenteditable="true" inputmode="numeric"></td><td contenteditable="true"></td><td contenteditable="true" inputmode="numeric"></td><td contenteditable="true" inputmode="numeric"></td><td contenteditable="true"></td></tr><tr><td contenteditable="true">KLM571</td><td contenteditable="true">PH</td><td contenteditable="true">B789</td><td contenteditable="true">HTKJ</td><td contenteditable="true" inputmode="numeric">1950</td><td contenteditable="true" inputmode="numeric"></td><td contenteditable="true"></td><td contenteditable="true" inputmode="numeric"></td><td contenteditable="true" inputmode="numeric"></td><td contenteditable="true"></td></tr><tr><td contenteditable="true"></td><td contenteditable="true"></td><td contenteditable="true"></td><td contenteditable="true"></td><td contenteditable="true" inputmode="numeric"></td><td contenteditable="true" inputmode="numeric"></td><td contenteditable="true"></td><td contenteditable="true" inputmode="numeric"></td><td contenteditable="true" inputmode="numeric"></td><td contenteditable="true"></td></tr><tr><td contenteditable="true"></td><td contenteditable="true"></td><td contenteditable="true"></td><td contenteditable="true"></td><td contenteditable="true" inputmode="numeric"></td><td contenteditable="true" inputmode="numeric"></td><td contenteditable="true"></td><td contenteditable="true" inputmode="numeric"></td><td contenteditable="true" inputmode="numeric"></td><td contenteditable="true"></td></tr><tr><td contenteditable="true"></td><td contenteditable="true"></td><td contenteditable="true"></td><td contenteditable="true"></td><td contenteditable="true" inputmode="numeric"></td><td contenteditable="true" inputmode="numeric"></td><td contenteditable="true"></td><td contenteditable="true" inputmode="numeric"></td><td contenteditable="true" inputmode="numeric"></td><td contenteditable="true"></td></tr><tr><td contenteditable="true"></td><td contenteditable="true"></td><td contenteditable="true"></td><td contenteditable="true"></td><td contenteditable="true" inputmode="numeric"></td><td contenteditable="true" inputmode="numeric"></td><td contenteditable="true"></td><td contenteditable="true" inputmode="numeric"></td><td contenteditable="true" inputmode="numeric"></td><td contenteditable="true"></td></tr><tr><td contenteditable="true"></td><td contenteditable="true"></td><td contenteditable="true"></td><td contenteditable="true"></td><td contenteditable="true" inputmode="numeric"></td><td contenteditable="true" inputmode="numeric"></td><td contenteditable="true"></td><td contenteditable="true" inputmode="numeric"></td><td contenteditable="true" inputmode="numeric"></td><td contenteditable="true"></td></tr></tbody>
+                </table>
+            <button style="cursor: pointer; margin-top: 10px;">+</button></div>
+
+            <!-- Right Table Section (OUTBOUND TFC) -->
+            <div>
+                <div class="table-header">
+                    <h2><span style="cursor: pointer; margin-right: 10px;"></span>OUTBOUND TFC</h2>
+                    <div class="header-input">
+                        <!-- DAY Dropdown -->
+                        <select id="day-outbound">
+                            <option value="MON">MON</option>
+                            <option value="TUE">TUE</option>
+                            <option value="WED">WED</option>
+                            <option value="THU">THU</option>
+                            <option value="FRI">FRI</option>
+                            <option value="SAT">SAT</option>
+                            <option value="SUN">SUN</option>
+                        </select>
+                        <!-- DATE Picker -->
+                        <div class="date-input-container">
+                            <input type="date" id="date-outbound">
+                            <!-- Remove the placeholder since the input is now visible -->
+                        </div>
+                    </div>
+                </div>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>AIM</th>
+                            <th>REG</th>
+                            <th>TYPE</th>
+                            <th>SVC</th>
+                            <th>DEST</th>
+                            <th>EOBT</th>
+                            <th>ATD</th>
+                            <th>POB</th>
+                            <th>FR</th>
+                            <th>ADDRESSEE’S</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <!-- Two rows for OUTBOUND TFC -->
+                        <tr>
+                            <td contenteditable="true" inputmode="numeric" class="aim-cell invalid"></td>
+                            <td contenteditable="true">5HTCI</td>
+                            <td contenteditable="true">BCS3</td>
+                            <td contenteditable="true">ATC110/1</td>
+                            <td contenteditable="true" class="dest-cell">HTMW</td>
+                            <td contenteditable="true" inputmode="numeric">0200</td>
+                            <td contenteditable="true" inputmode="numeric"></td>
+                            <td contenteditable="true" inputmode="numeric" class="pob-cell"></td> <!-- POB Column -->
+                            <td contenteditable="true" inputmode="numeric" class="fr-cell">02</td> <!-- FR Column -->
+                            <td contenteditable="true"></td>
+                        </tr>
+                        <tr>
+                            <td contenteditable="true" inputmode="numeric" class="aim-cell"></td>
+                            <td contenteditable="true">5HTCE</td>
+                            <td contenteditable="true">DH8D</td>
+                            <td contenteditable="true">ATC200</td>
+                            <td contenteditable="true" class="dest-cell">HKJK</td>
+                            <td contenteditable="true" inputmode="numeric">0200</td>
+                            <td contenteditable="true" inputmode="numeric"></td>
+                            <td contenteditable="true" inputmode="numeric" class="pob-cell"></td> <!-- POB Column -->
+                            <td contenteditable="true" inputmode="numeric" class="fr-cell">01</td> <!-- FR Column -->
+                            <td contenteditable="true"></td>
+                        </tr>
+                        <tr>
+                            <td contenteditable="true" inputmode="numeric" class="aim-cell"></td>
+                            <td contenteditable="true">5HTCK</td>
+                            <td contenteditable="true">DH8D</td>
+                            <td contenteditable="true">ATC112/3</td>
+                            <td contenteditable="true" class="dest-cell">HTIR</td>
+                            <td contenteditable="true" inputmode="numeric">0620</td>
+                            <td contenteditable="true" inputmode="numeric"></td>
+                            <td contenteditable="true" inputmode="numeric" class="pob-cell"></td> <!-- POB Column -->
+                            <td contenteditable="true" inputmode="numeric" class="fr-cell">02</td> <!-- FR Column -->
+                            <td contenteditable="true"></td>
+                        </tr>
+                        <tr>
+                            <td contenteditable="true" inputmode="numeric" class="aim-cell"></td>
+                            <td contenteditable="true">5HTCK</td>
+                            <td contenteditable="true">DH8D</td>
+                            <td contenteditable="true">ATC108/9</td>
+                            <td contenteditable="true" class="dest-cell">HTDO</td>
+                            <td contenteditable="true" inputmode="numeric">0300</td>
+                            <td contenteditable="true" inputmode="numeric"></td>
+                            <td contenteditable="true" inputmode="numeric" class="pob-cell"></td> <!-- POB Column -->
+                            <td contenteditable="true" inputmode="numeric" class="fr-cell">02</td> <!-- FR Column -->
+                            <td contenteditable="true"></td>
+                        </tr>
+                        <tr>
+                            <td contenteditable="true" inputmode="numeric" class="aim-cell"></td>
+                            <td contenteditable="true">5HTCD</td>
+                            <td contenteditable="true">DH8D</td>
+                            <td contenteditable="true">ATC116/7</td>
+                            <td contenteditable="true" class="dest-cell">HTMT</td>
+                            <td contenteditable="true" inputmode="numeric">0640</td>
+                            <td contenteditable="true" inputmode="numeric"></td>
+                            <td contenteditable="true" inputmode="numeric" class="pob-cell"></td> <!-- POB Column -->
+                            <td contenteditable="true" inputmode="numeric" class="fr-cell">02</td> <!-- FR Column -->
+                            <td contenteditable="true"></td>
+                        </tr>
+                        <tr>
+                            <td contenteditable="true" inputmode="numeric" class="aim-cell"></td>
+                            <td contenteditable="true">5HTCB</td>
+                            <td contenteditable="true">DH8D</td>
+                            <td contenteditable="true">ATC157</td>
+                            <td contenteditable="true" class="dest-cell">HTZA</td>
+                            <td contenteditable="true" inputmode="numeric">0500</td>
+                            <td contenteditable="true" inputmode="numeric"></td>
+                            <td contenteditable="true" inputmode="numeric" class="pob-cell"></td> <!-- POB Column -->
+                            <td contenteditable="true" inputmode="numeric" class="fr-cell">02</td> <!-- FR Column -->
+                            <td contenteditable="true">DEP/HTAR</td>
+                        </tr>
+                        <tr>
+                            <td contenteditable="true" inputmode="numeric" class="aim-cell"></td>
+                            <td contenteditable="true">5HTCB</td>
+                            <td contenteditable="true">DH8D</td>
+                            <td contenteditable="true">ATC132/3</td>
+                            <td contenteditable="true" class="dest-cell">HTSO</td>
+                            <td contenteditable="true" inputmode="numeric">0810</td>
+                            <td contenteditable="true" inputmode="numeric"></td>
+                            <td contenteditable="true" inputmode="numeric" class="pob-cell"></td> <!-- POB Column -->
+                            <td contenteditable="true" inputmode="numeric" class="fr-cell">02</td> <!-- FR Column -->
+                            <td contenteditable="true"></td>
+                        </tr>
+                        <tr>
+                            <td contenteditable="true" inputmode="numeric" class="aim-cell"></td>
+                            <td contenteditable="true">5HTCE</td>
+                            <td contenteditable="true">DH8D</td>
+                            <td contenteditable="true">ATC218/9</td>
+                            <td contenteditable="true" class="dest-cell">HTKA</td>
+                            <td contenteditable="true" inputmode="numeric">0650</td>
+                            <td contenteditable="true" inputmode="numeric"></td>
+                            <td contenteditable="true" inputmode="numeric" class="pob-cell"></td> <!-- POB Column -->
+                            <td contenteditable="true" inputmode="numeric" class="fr-cell">03</td> <!-- FR Column -->
+                            <td contenteditable="true"></td>
+                        </tr>
+                        <tr>
+                            <td contenteditable="true" inputmode="numeric" class="aim-cell"></td>
+                            <td contenteditable="true">5HTCQ</td>
+                            <td contenteditable="true">B39M</td>
+                            <td contenteditable="true">ATC208</td>
+                            <td contenteditable="true" class="dest-cell">FAOR</td>
+                            <td contenteditable="true" inputmode="numeric">0700</td>
+                            <td contenteditable="true" inputmode="numeric"></td>
+                            <td contenteditable="true" inputmode="numeric" class="pob-cell"></td> <!-- POB Column -->
+                            <td contenteditable="true" inputmode="numeric" class="fr-cell">01</td> <!-- FR Column -->
+                            <td contenteditable="true"></td>
+                        </tr>
+                        <tr>
+                            <td contenteditable="true" inputmode="numeric" class="aim-cell"></td>
+                            <td contenteditable="true">5HTCI</td>
+                            <td contenteditable="true">BCS3</td>
+                            <td contenteditable="true">ATC214/5</td>
+                            <td contenteditable="true" class="dest-cell">HTKJ</td>
+                            <td contenteditable="true" inputmode="numeric">0745</td>
+                            <td contenteditable="true" inputmode="numeric"></td>
+                            <td contenteditable="true" inputmode="numeric" class="pob-cell"></td> <!-- POB Column -->
+                            <td contenteditable="true" inputmode="numeric" class="fr-cell">03</td> <!-- FR Column -->
+                            <td contenteditable="true"></td>
+                        </tr>
+                        <tr>
+                            <td contenteditable="true" inputmode="numeric" class="aim-cell"></td>
+                            <td contenteditable="true">5HTCP</td>
+                            <td contenteditable="true">B39M</td>
+                            <td contenteditable="true">ATC213</td>
+                            <td contenteditable="true" class="dest-cell">FLSK</td>
+                            <td contenteditable="true" inputmode="numeric">0800</td>
+                            <td contenteditable="true" inputmode="numeric"></td>
+                            <td contenteditable="true" inputmode="numeric" class="pob-cell"></td> <!-- POB Column -->
+                            <td contenteditable="true" inputmode="numeric" class="fr-cell">01</td> <!-- FR Column -->
+                            <td contenteditable="true"></td>
+                        </tr>
+                        <tr>
+                            <td contenteditable="true" inputmode="numeric" class="aim-cell"></td>
+                            <td contenteditable="true">5HTCD</td>
+                            <td contenteditable="true">DH8D</td>
+                            <td contenteditable="true">ATC136/7</td>
+                            <td contenteditable="true" class="dest-cell">HTZA</td>
+                            <td contenteditable="true" inputmode="numeric">1040</td>
+                            <td contenteditable="true" inputmode="numeric"></td>
+                            <td contenteditable="true" inputmode="numeric" class="pob-cell"></td> <!-- POB Column -->
+                            <td contenteditable="true" inputmode="numeric" class="fr-cell">04</td> <!-- FR Column -->
+                            <td contenteditable="true"></td>
+                        </tr>
+                        <tr>
+                            <td contenteditable="true" inputmode="numeric" class="aim-cell"></td>
+                            <td contenteditable="true">5HTCD</td>
+                            <td contenteditable="true">DH8D</td>
+                            <td contenteditable="true">ATC118/9</td>
+                            <td contenteditable="true" class="dest-cell">HTDO</td>
+                            <td contenteditable="true" inputmode="numeric">1640</td>
+                            <td contenteditable="true" inputmode="numeric"></td>
+                            <td contenteditable="true" inputmode="numeric" class="pob-cell"></td> <!-- POB Column -->
+                            <td contenteditable="true" inputmode="numeric" class="fr-cell">02</td> <!-- FR Column -->
+                            <td contenteditable="true"></td>
+                        </tr>
+                        <tr>
+                            <td contenteditable="true" inputmode="numeric" class="aim-cell"></td>
+                            <td contenteditable="true">5HTCB</td>
+                            <td contenteditable="true">DH8D</td>
+                            <td contenteditable="true">ATC156</td>
+                            <td contenteditable="true" class="dest-cell">HTAR</td>
+                            <td contenteditable="true" inputmode="numeric">1300</td>
+                            <td contenteditable="true" inputmode="numeric"></td>
+                            <td contenteditable="true" inputmode="numeric" class="pob-cell"></td> <!-- POB Column -->
+                            <td contenteditable="true" inputmode="numeric" class="fr-cell">01</td> <!-- FR Column -->
+                            <td contenteditable="true"></td>
+                        </tr>
+                        <tr>
+                            <td contenteditable="true" inputmode="numeric" class="aim-cell"></td>
+                            <td contenteditable="true">5HTCK</td>
+                            <td contenteditable="true">DH8D</td>
+                            <td contenteditable="true">ATC106/7</td>
+                            <td contenteditable="true" class="dest-cell">HTGW</td>
+                            <td contenteditable="true" inputmode="numeric">1410</td>
+                            <td contenteditable="true" inputmode="numeric"></td>
+                            <td contenteditable="true" inputmode="numeric" class="pob-cell"></td> <!-- POB Column -->
+                            <td contenteditable="true" inputmode="numeric" class="fr-cell">02</td> <!-- FR Column -->
+                            <td contenteditable="true"></td>
+                        </tr>
+                        <tr>
+                            <td contenteditable="true" inputmode="numeric" class="aim-cell"></td>
+                            <td contenteditable="true">5HTCD</td>
+                            <td contenteditable="true">DH8D</td>
+                            <td contenteditable="true">ATC202</td>
+                            <td contenteditable="true" class="dest-cell">HKJK</td>
+                            <td contenteditable="true" inputmode="numeric">1840</td>
+                            <td contenteditable="true" inputmode="numeric"></td>
+                            <td contenteditable="true" inputmode="numeric" class="pob-cell"></td> <!-- POB Column -->
+                            <td contenteditable="true" inputmode="numeric" class="fr-cell">01</td> <!-- FR Column -->
+                            <td contenteditable="true"></td>
+                        </tr>
+                        <tr>
+                            <td contenteditable="true" inputmode="numeric" class="aim-cell"></td>
+                            <td contenteditable="true">5HTCP</td>
+                            <td contenteditable="true">B39M</td>
+                            <td contenteditable="true">ATC404</td>
+                            <td contenteditable="true" class="dest-cell">OMDB</td>
+                            <td contenteditable="true" inputmode="numeric">1700</td>
+                            <td contenteditable="true" inputmode="numeric"></td>
+                            <td contenteditable="true" inputmode="numeric" class="pob-cell"></td> <!-- POB Column -->
+                            <td contenteditable="true" inputmode="numeric" class="fr-cell">01</td> <!-- FR Column -->
+                            <td contenteditable="true"></td>
+                        </tr>
+                        <tr>
+                            <td contenteditable="true" inputmode="numeric" class="aim-cell"></td>
+                            <td contenteditable="true">5HTCR</td>
+                            <td contenteditable="true">B788</td>
+                            <td contenteditable="true">ATC400</td>
+                            <td contenteditable="true" class="dest-cell">VABB</td>
+                            <td contenteditable="true" inputmode="numeric">1720</td>
+                            <td contenteditable="true" inputmode="numeric"></td>
+                            <td contenteditable="true" inputmode="numeric" class="pob-cell"></td> <!-- POB Column -->
+                            <td contenteditable="true" inputmode="numeric" class="fr-cell">01</td> <!-- FR Column -->
+                            <td contenteditable="true"></td>
+                        </tr>
+                        <tr>
+                            <td contenteditable="true" inputmode="numeric" class="aim-cell"></td>
+                            <td contenteditable="true">5HTCM</td>
+                            <td contenteditable="true">BCS3</td>
+                            <td contenteditable="true">ATC124/5</td>
+                            <td contenteditable="true" class="dest-cell">HTZA</td>
+                            <td contenteditable="true" inputmode="numeric">1800</td>
+                            <td contenteditable="true" inputmode="numeric"></td>
+                            <td contenteditable="true" inputmode="numeric" class="pob-cell"></td> <!-- POB Column -->
+                            <td contenteditable="true" inputmode="numeric" class="fr-cell">04</td> <!-- FR Column -->
+                            <td contenteditable="true"></td>
+                        </tr>
+                        <tr>
+                            <td contenteditable="true" inputmode="numeric" class="aim-cell"></td>
+                            <td contenteditable="true">5HTCQ</td>
+                            <td contenteditable="true">B39M</td>
+                            <td contenteditable="true">ATC102/3</td>
+                            <td contenteditable="true" class="dest-cell">HTMW</td>
+                            <td contenteditable="true" inputmode="numeric">1800</td>
+                            <td contenteditable="true" inputmode="numeric"></td>
+                            <td contenteditable="true" inputmode="numeric" class="pob-cell"></td> <!-- POB Column -->
+                            <td contenteditable="true" inputmode="numeric" class="fr-cell">02</td> <!-- FR Column -->
+                            <td contenteditable="true"></td>
+                        </tr>
+                        <tr>
+                            <td contenteditable="true" inputmode="numeric" class="aim-cell"></td>
+                            <td contenteditable="true">5HPWB</td>
+                            <td contenteditable="true">AT75</td>
+                            <td contenteditable="true">PRF717/8</td>
+                            <td contenteditable="true" class="dest-cell">HTKJ</td>
+                            <td contenteditable="true" inputmode="numeric">0200</td>
+                            <td contenteditable="true" inputmode="numeric"></td>
+                            <td contenteditable="true" inputmode="numeric" class="pob-cell"></td> <!-- POB Column -->
+                            <td contenteditable="true" inputmode="numeric" class="fr-cell">04</td> <!-- FR Column -->
+                            <td contenteditable="true"></td>
+                        </tr>
+                        <tr>
+                            <td contenteditable="true" inputmode="numeric" class="aim-cell"></td>
+                            <td contenteditable="true">5HPWB</td>
+                            <td contenteditable="true">AT75</td>
+                            <td contenteditable="true">PRF400/1</td>
+                            <td contenteditable="true" class="dest-cell">HTMT</td>
+                            <td contenteditable="true" inputmode="numeric">0930</td>
+                            <td contenteditable="true" inputmode="numeric"></td>
+                            <td contenteditable="true" inputmode="numeric" class="pob-cell"></td> <!-- POB Column -->
+                            <td contenteditable="true" inputmode="numeric" class="fr-cell">02</td> <!-- FR Column -->
+                            <td contenteditable="true"></td>
+                        </tr>
+                        <tr>
+                            <td contenteditable="true" inputmode="numeric" class="aim-cell"></td>
+                            <td contenteditable="true">5HPWB</td>
+                            <td contenteditable="true">AT75</td>
+                            <td contenteditable="true">PRF713/2</td>
+                            <td contenteditable="true" class="dest-cell">HTZA</td>
+                            <td contenteditable="true" inputmode="numeric">1445</td>
+                            <td contenteditable="true" inputmode="numeric"></td>
+                            <td contenteditable="true" inputmode="numeric" class="pob-cell"></td> <!-- POB Column -->
+                            <td contenteditable="true" inputmode="numeric" class="fr-cell">03</td> <!-- FR Column -->
+                            <td contenteditable="true"></td>
+                        </tr>
+                        <tr>
+                            <td contenteditable="true" inputmode="numeric" class="aim-cell"></td>
+                            <td contenteditable="true">5HPWC</td>
+                            <td contenteditable="true">AT75</td>
+                            <td contenteditable="true">PRF420/1</td>
+                            <td contenteditable="true" class="dest-cell">HTZA</td>
+                            <td contenteditable="true" inputmode="numeric">0350</td>
+                            <td contenteditable="true" inputmode="numeric"></td>
+                            <td contenteditable="true" inputmode="numeric" class="pob-cell"></td> <!-- POB Column -->
+                            <td contenteditable="true" inputmode="numeric" class="fr-cell">04</td> <!-- FR Column -->
+                            <td contenteditable="true"></td>
+                        </tr>
+                        <tr>
+                            <td contenteditable="true" inputmode="numeric" class="aim-cell"></td>
+                            <td contenteditable="true">5HPWC</td>
+                            <td contenteditable="true">AT75</td>
+                            <td contenteditable="true">PRF416/7</td>
+                            <td contenteditable="true" class="dest-cell">HTKJ</td>
+                            <td contenteditable="true" inputmode="numeric">0905</td>
+                            <td contenteditable="true" inputmode="numeric"></td>
+                            <td contenteditable="true" inputmode="numeric" class="pob-cell"></td> <!-- POB Column -->
+                            <td contenteditable="true" inputmode="numeric" class="fr-cell">04</td> <!-- FR Column -->
+                            <td contenteditable="true"></td>
+                        </tr>
+                        <tr>
+                            <td contenteditable="true" inputmode="numeric" class="aim-cell"></td>
+                            <td contenteditable="true">5HPWE</td>
+                            <td contenteditable="true">AT45</td>
+                            <td contenteditable="true">PRF642</td>
+                            <td contenteditable="true" class="dest-cell">FMCH</td>
+                            <td contenteditable="true" inputmode="numeric">0600</td>
+                            <td contenteditable="true" inputmode="numeric"></td>
+                            <td contenteditable="true" inputmode="numeric" class="pob-cell"></td> <!-- POB Column -->
+                            <td contenteditable="true" inputmode="numeric" class="fr-cell">01</td> <!-- FR Column -->
+                            <td contenteditable="true"></td>
+                        </tr>
+                        <tr>
+                            <td contenteditable="true" inputmode="numeric" class="aim-cell"></td>
+                            <td contenteditable="true">5HPWG</td>
+                            <td contenteditable="true">AT75</td>
+                            <td contenteditable="true">PRF612/3</td>
+                            <td contenteditable="true" class="dest-cell">HTDO</td>
+                            <td contenteditable="true" inputmode="numeric">0240</td>
+                            <td contenteditable="true" inputmode="numeric"></td>
+                            <td contenteditable="true" inputmode="numeric" class="pob-cell"></td> <!-- POB Column -->
+                            <td contenteditable="true" inputmode="numeric" class="fr-cell">04</td> <!-- FR Column -->
+                            <td contenteditable="true"></td>
+                        </tr>
+                        <tr>
+                            <td contenteditable="true" inputmode="numeric" class="aim-cell"></td>
+                            <td contenteditable="true">5HPWG</td>
+                            <td contenteditable="true">AT75</td>
+                            <td contenteditable="true">PRF422/3</td>
+                            <td contenteditable="true" class="dest-cell">HTAR</td>
+                            <td contenteditable="true" inputmode="numeric">0905</td>
+                            <td contenteditable="true" inputmode="numeric"></td>
+                            <td contenteditable="true" inputmode="numeric" class="pob-cell"></td> <!-- POB Column -->
+                            <td contenteditable="true" inputmode="numeric" class="fr-cell">03</td> <!-- FR Column -->
+                            <td contenteditable="true"></td>
+                        </tr>
+                        <tr>
+                            <td contenteditable="true" inputmode="numeric" class="aim-cell"></td>
+                            <td contenteditable="true">5HPWG</td>
+                            <td contenteditable="true">AT75</td>
+                            <td contenteditable="true">PRF721/0</td>
+                            <td contenteditable="true" class="dest-cell">HTKJ</td>
+                            <td contenteditable="true" inputmode="numeric">1340</td>
+                            <td contenteditable="true" inputmode="numeric"></td>
+                            <td contenteditable="true" inputmode="numeric" class="pob-cell"></td> <!-- POB Column -->
+                            <td contenteditable="true" inputmode="numeric" class="fr-cell">03</td> <!-- FR Column -->
+                            <td contenteditable="true"></td>
+                        </tr>
+                        <tr>
+                            <td contenteditable="true" inputmode="numeric" class="aim-cell"></td>
+                            <td contenteditable="true"></td>
+                            <td contenteditable="true"></td>
+                            <td contenteditable="true"></td>
+                            <td contenteditable="true" class="dest-cell"></td>
+                            <td contenteditable="true" inputmode="numeric"></td>
+                            <td contenteditable="true" inputmode="numeric"></td>
+                            <td contenteditable="true" inputmode="numeric" class="pob-cell"></td> <!-- POB Column -->
+                            <td contenteditable="true" inputmode="numeric" class="fr-cell"></td> <!-- FR Column -->
+                            <td contenteditable="true"></td>
+                        </tr>
+
+                    </tbody>
+                </table>
+            <button style="cursor: pointer; margin-top: 10px;">+</button></div>
+        </div>
+    </div>
+
+<script>
+// Helper function to validate AIM input
+function isValidAIMInput(input) {
+    return /^\d{1,3}$/.test(input) && parseInt(input, 10) >= 1 && parseInt(input, 10) <= 999;
+}
+
+// Function to generate AIM numbers based on the starting value
+function generateAIMNumbers(startValue) {
+    const aimCells = document.querySelectorAll('.aim-cell:not(.header-cell)');
+    let currentValue = parseInt(startValue, 10);
+
+    if (isNaN(currentValue) || currentValue < 1 || currentValue > 999) {
+        console.error('Invalid start value for AIM numbers.');
+        return;
+    }
+
+    aimCells.forEach((cell, index) => {
+        if (index === 0) {
+            // Populate the first cell with the user-provided value
+            cell.innerText = currentValue.toString().padStart(3, '0');
+        } else {
+            // Increment and populate the rest of the cells
+            currentValue = (currentValue % 999) + 1; // Wrap around after 999
+            cell.innerText = currentValue.toString().padStart(3, '0'); // Format as 3 digits
+        }
+    });
+}
+
+// Function to handle AIM cell input
+function handleAIMInput(event) {
+    const cell = event.target;
+    const input = cell.innerText;
+
+    if (!isValidAIMInput(input)) {
+        cell.classList.add('invalid'); // Add a class for styling invalid input
+    } else {
+        cell.classList.remove('invalid');
+    }
+}
+
+// Function to auto-format the AIM cell and generate numbers when the user finishes typing
+function autoFormatAIM(event) {
+    const cell = event.target;
+    const input = cell.innerText;
+
+    if (isValidAIMInput(input)) {
+        const numericValue = parseInt(input, 10);
+        cell.innerText = numericValue.toString().padStart(3, '0'); // Format as 3 digits
+        generateAIMNumbers(numericValue); // Populate the rest of the AIM cells
+    } else {
+        // Do not clear the input if it's invalid; let the user correct it
+        cell.classList.add('invalid'); // Add a class for styling invalid input
+    }
+}
+
+// Function to handle Tab key press
+function handleTabKey(event) {
+    if (event.key === 'Tab') {
+        const cell = event.target;
+        setTimeout(() => {
+            cell.blur(); // Trigger the blur event to format the input
+        }, 0);
+    }
+}
+
+// Add event listeners to AIM cells
+document.querySelectorAll('.aim-cell').forEach((cell) => {
+    cell.addEventListener('input', handleAIMInput); // Use 'input' event for real-time validation
+    cell.addEventListener('blur', autoFormatAIM); // Use 'blur' event to auto-format when done typing
+    cell.addEventListener('keydown', handleTabKey); // Handle Tab key press
+});
+
+// Function to enforce uppercase and ensure left-to-right typing
+function enforceUppercase(event) {
+    const cell = event.target;
+    const originalText = cell.innerText;
+    const cursorPosition = window.getSelection().getRangeAt(0).startOffset;
+
+    cell.innerText = originalText.toUpperCase();
+
+    const range = document.createRange();
+    const selection = window.getSelection();
+    range.setStart(cell.childNodes[0], cursorPosition);
+    range.collapse(true);
+    selection.removeAllRanges();
+    selection.addRange(range);
+}
+
+// Function to enforce numeric input for SKED, ATC, ETA, EET, ETA EDZ, EOBT, and ATD columns
+function enforceNumericInput(event) {
+    const cell = event.target;
+    const originalText = cell.innerText;
+    const cursorPosition = window.getSelection().getRangeAt(0).startOffset;
+
+    const numericText = originalText.replace(/[^0-9]/g, '');
+    cell.innerText = numericText;
+
+    const range = document.createRange();
+    const selection = window.getSelection();
+    range.setStart(cell.childNodes[0], cursorPosition);
+    range.collapse(true);
+    selection.removeAllRanges();
+    selection.addRange(range);
+}
+
+// Function to enforce numeric input for POB and FR columns (positive numbers only)
+function enforceNumericInputForPOBAndFR(event) {
+    const cell = event.target;
+    const originalText = cell.innerText;
+
+    // Allow only positive numbers (digits 0-9)
+    const numericText = originalText.replace(/[^0-9]/g, '');
+    cell.innerText = numericText;
+
+    // Move the cursor to the end of the input
+    const range = document.createRange();
+    const selection = window.getSelection();
+    range.selectNodeContents(cell);
+    range.collapse(false); // Move cursor to the end
+    selection.removeAllRanges();
+    selection.addRange(range);
+}
+
+// Function to validate FROM and DEST columns (strictly four alphabets)
+function validateFourAlphabets(event) {
+    const cell = event.target;
+    const input = cell.innerText.toUpperCase();
+
+    if (input.length !== 4 || !/^[A-Z]{4}$/.test(input)) {
+        cell.innerText = ''; // Clear invalid input
+    }
+}
+
+// Function to validate SKED, ATC, ETA, EET, ETA EDZ, EOBT, and ATD columns
+function validateFourNumeric(event) {
+    const cell = event.target;
+
+    // Skip validation for AIM, POB, and FR columns
+    if (cell.classList.contains('aim-cell') || cell.classList.contains('pob-cell') || cell.classList.contains('fr-cell')) {
+        return;
+    }
+
+    const input = cell.innerText;
+
+    // Ensure the input is exactly 4 digits
+    if (input.length !== 4 || !/^\d{4}$/.test(input)) {
+        cell.innerText = ''; // Clear invalid input
+        return;
+    }
+
+    // Split the input into hours and minutes
+    const hours = parseInt(input.substring(0, 2), 10);
+    const minutes = parseInt(input.substring(2, 4), 10);
+
+    // Validate hours (00-23) and minutes (00-59)
+    if (hours < 0 || hours > 23 || minutes < 0 || minutes > 59) {
+        cell.innerText = ''; // Clear invalid input
+    }
+}
+
+// Function to add collapse/expand icons
+function addCollapseExpandIcons() {
+    const inboundHeader = document.querySelector('.table-header h2');
+    const outboundHeader = document.querySelectorAll('.table-header h2')[1];
+
+    // Inbound Table Icon
+    const inboundIcon = document.createElement('span');
+    inboundIcon.innerText = '';
+    inboundIcon.style.cursor = 'pointer';
+    inboundIcon.style.marginRight = '10px';
+    inboundHeader.prepend(inboundIcon);
+
+    // Outbound Table Icon
+    const outboundIcon = document.createElement('span');
+    outboundIcon.innerText = '';
+    outboundIcon.style.cursor = 'pointer';
+    outboundIcon.style.marginRight = '10px';
+    outboundHeader.prepend(outboundIcon);
+
+    // Toggle Inbound Table
+    inboundIcon.addEventListener('click', () => {
+        const table = inboundHeader.closest('div').querySelector('table');
+        if (table.style.display === 'none') {
+            table.style.display = 'table';
+            inboundIcon.innerText = '-';
+        } else {
+            table.style.display = 'none';
+            inboundIcon.innerText = '+';
+        }
+    });
+
+    // Toggle Outbound Table
+    outboundIcon.addEventListener('click', () => {
+        const table = outboundHeader.closest('div').querySelector('table');
+        if (table.style.display === 'none') {
+            table.style.display = 'table';
+            outboundIcon.innerText = '-';
+        } else {
+            table.style.display = 'none';
+            outboundIcon.innerText = '+';
+        }
+    });
+}
+
+// Function to add rows
+function addRows() {
+    const tables = document.querySelectorAll('table');
+
+    tables.forEach(table => {
+        const addRowButton = document.createElement('button');
+        addRowButton.innerText = '+';
+        addRowButton.style.cursor = 'pointer';
+        addRowButton.style.marginTop = '10px';
+        table.parentElement.appendChild(addRowButton);
+
+        addRowButton.addEventListener('click', () => {
+            const tbody = table.querySelector('tbody');
+            for (let i = 0; i < 5; i++) { // Append 5 rows
+                const newRow = tbody.insertRow();
+
+                for (let j = 0; j < tbody.rows[0].cells.length; j++) {
+                    const newCell = newRow.insertCell();
+                    newCell.contentEditable = true;
+
+                    if (tbody.rows[0].cells[j].classList.contains('aim-cell')) {
+                        newCell.classList.add('aim-cell');
+                        newCell.addEventListener('input', handleAIMInput);
+                        newCell.addEventListener('blur', autoFormatAIM);
+                    } else if (tbody.rows[0].cells[j].classList.contains('pob-cell') || tbody.rows[0].cells[j].classList.contains('fr-cell')) {
+                        newCell.classList.add(tbody.rows[0].cells[j].classList.contains('pob-cell') ? 'pob-cell' : 'fr-cell');
+                        newCell.addEventListener('input', enforceNumericInputForPOBAndFR);
+                    } else if (tbody.rows[0].cells[j].getAttribute('inputmode') === 'numeric') {
+                        newCell.setAttribute('inputmode', 'numeric');
+                        newCell.addEventListener('input', enforceNumericInput);
+                    } else {
+                        newCell.addEventListener('input', enforceUppercase);
+                    }
+                }
+            }
+        });
+    });
+}
+
+// Function to set the current date and time
+function setCurrentDate() {
+    const currentDate = new Date();
+    const formattedDate = currentDate.toISOString().split('T')[0]; // YYYY-MM-DD format
+
+    const dateInbound = document.getElementById('date-inbound');
+    const dateOutbound = document.getElementById('date-outbound');
+
+    dateInbound.value = formattedDate;
+    dateOutbound.value = formattedDate;
+
+    const dayInbound = document.getElementById('day-inbound');
+    const dayOutbound = document.getElementById('day-outbound');
+
+    const dayOfWeek = getDayOfWeek(currentDate);
+    dayInbound.value = dayOfWeek;
+    dayOutbound.value = dayOfWeek;
+}
+
+// Function to get the day of the week from a date
+function getDayOfWeek(date) {
+    const days = ["SUN", "MON", "TUE", "WED", "THU", "FRI", "SAT"];
+    return days[date.getDay()];
+}
+
+// Function to synchronize DAY and DATE inputs
+function synchronizeInputs() {
+    const dayInbound = document.getElementById('day-inbound');
+    const dayOutbound = document.getElementById('day-outbound');
+    const dateInbound = document.getElementById('date-inbound');
+    const dateOutbound = document.getElementById('date-outbound');
+
+    // Synchronize DAY inputs
+    dayInbound.addEventListener('change', () => {
+        dayOutbound.value = dayInbound.value;
+    });
+    dayOutbound.addEventListener('change', () => {
+        dayInbound.value = dayOutbound.value;
+    });
+
+    // Synchronize DATE inputs and update DAY dropdown
+    dateInbound.addEventListener('change', () => {
+        const selectedDate = new Date(dateInbound.value);
+        dateOutbound.value = dateInbound.value;
+        const dayOfWeek = getDayOfWeek(selectedDate);
+        dayInbound.value = dayOfWeek;
+        dayOutbound.value = dayOfWeek;
+    });
+    dateOutbound.addEventListener('change', () => {
+        const selectedDate = new Date(dateOutbound.value);
+        dateInbound.value = dateOutbound.value;
+        const dayOfWeek = getDayOfWeek(selectedDate);
+        dayInbound.value = dayOfWeek;
+        dayOutbound.value = dayOfWeek;
+    });
+}
+
+// Add event listeners to all editable cells (excluding POB and FR)
+document.querySelectorAll('td[contenteditable="true"]').forEach(cell => {
+    if (!cell.classList.contains('pob-cell') && !cell.classList.contains('fr-cell')) {
+        cell.addEventListener('input', enforceUppercase);
+    }
+});
+
+// Add event listeners to numeric cells (excluding POB and FR)
+document.querySelectorAll('td[inputmode="numeric"]').forEach(cell => {
+    if (!cell.classList.contains('pob-cell') && !cell.classList.contains('fr-cell')) {
+        cell.addEventListener('input', enforceNumericInput);
+    }
+});
+
+// Add event listeners to POB and FR cells
+document.querySelectorAll('.pob-cell, .fr-cell').forEach(cell => {
+    cell.addEventListener('input', enforceNumericInputForPOBAndFR);
+});
+
+// Add event listeners to FROM and DEST cells
+document.querySelectorAll('.from-cell, .dest-cell').forEach(cell => {
+    cell.addEventListener('blur', validateFourAlphabets);
+});
+
+// Add event listeners to SKED, ATC, ETA, EET, ETA EDZ, EOBT, and ATD cells (excluding POB and FR)
+document.querySelectorAll('td[inputmode="numeric"]').forEach(cell => {
+    if (!cell.classList.contains('pob-cell') && !cell.classList.contains('fr-cell')) {
+        cell.addEventListener('blur', validateFourNumeric);
+    }
+});
+
+
+
+// Add collapse/expand icons
+addCollapseExpandIcons();
+
+// Add rows functionality
+addRows();
+
+// Set the current date and time on page load
+setCurrentDate();
+
+// Synchronize DAY and DATE inputs on page load
+synchronizeInputs();
+
+// Register the Service Worker
+if ("serviceWorker" in navigator) {
+    navigator.serviceWorker.register("/sw.js")
+        .then((registration) => {
+            console.log("Service Worker registered with scope:", registration.scope);
+        })
+        .catch((error) => {
+            console.error("Service Worker registration failed:", error);
+        });
+}
+</script>
+
+
+
+</body></html>
