@@ -1,5 +1,10 @@
 <!DOCTYPE html>
 <html lang="en">
+    
+<!-- Add jQuery and Axios to your HTML -->
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+    
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -1318,104 +1323,90 @@ if ("serviceWorker" in navigator) {
 
 </script>
 
-<script> 
+<script>
+$(document).ready(function () {
+    let referenceData = []; // This will store the fetched data
+
     // Fetch data from predictiondata.html
-let referenceData = []; // This will store the fetched data
+    function fetchPredictionData() {
+        axios.get('/predictiondata.html')
+            .then(response => {
+                const parser = new DOMParser();
+                const doc = parser.parseFromString(response.data, 'text/html');
+                const rows = doc.querySelectorAll('table tbody tr');
 
-function fetchPredictionData() {
-    fetch('/predictiondata.html')
-        .then(response => response.text())
-        .then(data => {
-            // Parse the data (assuming it's in a table format)
-            const parser = new DOMParser();
-            const doc = parser.parseFromString(data, 'text/html');
-            const rows = doc.querySelectorAll('table tbody tr');
+                referenceData = [];
+                rows.forEach(row => {
+                    const cells = row.querySelectorAll('td');
+                    const rowData = Array.from(cells).map(cell => cell.innerText.trim());
+                    referenceData.push(rowData);
+                });
 
-            // Extract data from the rows
-            referenceData = [];
-            rows.forEach(row => {
-                const cells = row.querySelectorAll('td');
-                const rowData = Array.from(cells).map(cell => cell.innerText.trim());
-                referenceData.push(rowData);
+                console.log('Fetched reference data:', referenceData);
+                initializeFeatures(); // Initialize auto-completion and prediction
+            })
+            .catch(error => {
+                console.error('Error fetching prediction data:', error);
             });
+    }
 
-            console.log('Fetched reference data:', referenceData);
-
-            // Initialize auto-completion and prediction after data is fetched
-            initializeFeatures();
-        })
-        .catch(error => {
-            console.error('Error fetching prediction data:', error);
-        });
-}
-
-// Auto-completion for editable cells
-function setupAutoCompletion() {
-    // Auto-complete for "FROM" and "DEST" cells
-    document.querySelectorAll('.from-cell, .dest-cell').forEach(cell => {
-        cell.addEventListener('input', (event) => {
-            const input = event.target.innerText.toUpperCase();
-            const columnIndex = cell.classList.contains('from-cell') ? 3 : 4; // Assuming "FROM" is the 4th column and "DEST" is the 5th
+    // Auto-completion for editable cells
+    function setupAutoCompletion() {
+        // Auto-complete for "FROM" and "DEST" cells
+        $('.from-cell, .dest-cell').on('input', function (event) {
+            const input = $(this).text().toUpperCase();
+            const columnIndex = $(this).hasClass('from-cell') ? 3 : 4; // Assuming "FROM" is the 4th column and "DEST" is the 5th
 
             // Find matching data
             const matchingData = referenceData.filter(row => row[columnIndex] && row[columnIndex].startsWith(input));
 
             if (matchingData.length > 0) {
                 // Auto-complete the cell with the first matching value
-                event.target.innerText = matchingData[0][columnIndex];
+                $(this).text(matchingData[0][columnIndex]);
             }
         });
-    });
 
-    // Auto-complete for other editable cells
-    document.querySelectorAll('td[contenteditable="true"]').forEach(cell => {
-        if (!cell.classList.contains('from-cell') && !cell.classList.contains('dest-cell')) {
-            cell.addEventListener('input', (event) => {
-                const input = event.target.innerText.toUpperCase();
-                const columnIndex = Array.from(cell.parentElement.children).indexOf(cell); // Get the column index
+        // Auto-complete for other editable cells
+        $('td[contenteditable="true"]').not('.from-cell, .dest-cell').on('input', function (event) {
+            const input = $(this).text().toUpperCase();
+            const columnIndex = $(this).index(); // Get the column index
 
-                // Find matching data
-                const matchingData = referenceData.filter(row => row[columnIndex] && row[columnIndex].startsWith(input));
+            // Find matching data
+            const matchingData = referenceData.filter(row => row[columnIndex] && row[columnIndex].startsWith(input));
 
-                if (matchingData.length > 0) {
-                    // Auto-complete the cell with the first matching value
-                    event.target.innerText = matchingData[0][columnIndex];
-                }
-            });
-        }
-    });
-}
+            if (matchingData.length > 0) {
+                // Auto-complete the cell with the first matching value
+                $(this).text(matchingData[0][columnIndex]);
+            }
+        });
+    }
 
-// Prediction for numeric fields (e.g., ETA, EET, etc.)
-function setupPrediction() {
-    // Predict values for numeric fields based on historical data
-    document.querySelectorAll('td[inputmode="numeric"]').forEach(cell => {
-        if (!cell.classList.contains('pob-cell') && !cell.classList.contains('fr-cell')) {
-            cell.addEventListener('blur', (event) => {
-                const input = event.target.innerText;
-                const columnIndex = Array.from(cell.parentElement.children).indexOf(cell); // Get the column index
+    // Prediction for numeric fields (e.g., ETA, EET, etc.)
+    function setupPrediction() {
+        $('td[inputmode="numeric"]').not('.pob-cell, .fr-cell').on('blur', function (event) {
+            const input = $(this).text();
+            const columnIndex = $(this).index(); // Get the column index
 
-                // Find matching data
-                const matchingData = referenceData.filter(row => row[columnIndex] && row[columnIndex].startsWith(input));
+            // Find matching data
+            const matchingData = referenceData.filter(row => row[columnIndex] && row[columnIndex].startsWith(input));
 
-                if (matchingData.length > 0) {
-                    // Predict the value based on the average of matching data
-                    const averageValue = matchingData.reduce((sum, row) => sum + parseInt(row[columnIndex], 10), 0) / matchingData.length;
-                    event.target.innerText = Math.round(averageValue).toString().padStart(4, '0'); // Format as 4 digits
-                }
-            });
-        }
-    });
-}
+            if (matchingData.length > 0) {
+                // Predict the value based on the average of matching data
+                const averageValue = matchingData.reduce((sum, row) => sum + parseInt(row[columnIndex], 10), 0) / matchingData.length;
+                $(this).text(Math.round(averageValue).toString().padStart(4, '0')); // Format as 4 digits
+            }
+        });
+    }
 
-// Initialize auto-completion and prediction
-function initializeFeatures() {
-    setupAutoCompletion();
-    setupPrediction();
-}
+    // Initialize auto-completion and prediction
+    function initializeFeatures() {
+        setupAutoCompletion();
+        setupPrediction();
+    }
 
-// Call the fetch function when the page loads
-window.addEventListener('load', fetchPredictionData);
+    // Fetch data and initialize features when the page loads
+    fetchPredictionData();
+});
 </script>
 
 
