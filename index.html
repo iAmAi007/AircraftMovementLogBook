@@ -1314,6 +1314,111 @@ if ("serviceWorker" in navigator) {
             console.error("Service Worker registration failed:", error);
         });
 }
+
+
+</script>
+
+<script>
+// Fetch data from predictiondata.html
+let referenceData = []; // This will store the fetched data
+
+function fetchPredictionData() {
+    fetch('/predictiondata.html')
+        .then(response => response.text())
+        .then(data => {
+            // Parse the data (assuming it's in a table format)
+            const parser = new DOMParser();
+            const doc = parser.parseFromString(data, 'text/html');
+            const rows = doc.querySelectorAll('table tbody tr');
+
+            // Extract data from the rows
+            referenceData = [];
+            rows.forEach(row => {
+                const cells = row.querySelectorAll('td');
+                const rowData = Array.from(cells).map(cell => cell.innerText.trim());
+                referenceData.push(rowData);
+            });
+
+            console.log('Fetched reference data:', referenceData);
+        })
+        .catch(error => {
+            console.error('Error fetching prediction data:', error);
+        });
+}
+
+// Call the function to fetch data when the page loads
+fetchPredictionData();
+
+// Auto-completion for editable cells
+function setupAutoCompletion() {
+    // Auto-complete for "FROM" and "DEST" cells
+    document.querySelectorAll('.from-cell, .dest-cell').forEach(cell => {
+        cell.addEventListener('input', (event) => {
+            const input = event.target.innerText.toUpperCase();
+            const columnIndex = cell.classList.contains('from-cell') ? 3 : 4; // Assuming "FROM" is the 4th column and "DEST" is the 5th
+
+            // Find matching data
+            const matchingData = referenceData.filter(row => row[columnIndex] && row[columnIndex].startsWith(input));
+
+            if (matchingData.length > 0) {
+                // Auto-complete the cell with the first matching value
+                event.target.innerText = matchingData[0][columnIndex];
+            }
+        });
+    });
+
+    // Auto-complete for "SVC" and "REG" cells
+    document.querySelectorAll('td[contenteditable="true"]').forEach(cell => {
+        if (!cell.classList.contains('from-cell') && !cell.classList.contains('dest-cell')) {
+            cell.addEventListener('input', (event) => {
+                const input = event.target.innerText.toUpperCase();
+                const columnIndex = Array.from(cell.parentElement.children).indexOf(cell); // Get the column index
+
+                // Find matching data
+                const matchingData = referenceData.filter(row => row[columnIndex] && row[columnIndex].startsWith(input));
+
+                if (matchingData.length > 0) {
+                    // Auto-complete the cell with the first matching value
+                    event.target.innerText = matchingData[0][columnIndex];
+                }
+            });
+        }
+    });
+}
+
+// Prediction for numeric fields (e.g., ETA, EET, etc.)
+function setupPrediction() {
+    // Predict values for numeric fields based on historical data
+    document.querySelectorAll('td[inputmode="numeric"]').forEach(cell => {
+        if (!cell.classList.contains('pob-cell') && !cell.classList.contains('fr-cell')) {
+            cell.addEventListener('blur', (event) => {
+                const input = event.target.innerText;
+                const columnIndex = Array.from(cell.parentElement.children).indexOf(cell); // Get the column index
+
+                // Find matching data
+                const matchingData = referenceData.filter(row => row[columnIndex] && row[columnIndex].startsWith(input));
+
+                if (matchingData.length > 0) {
+                    // Predict the value based on the average of matching data
+                    const averageValue = matchingData.reduce((sum, row) => sum + parseInt(row[columnIndex], 10), 0) / matchingData.length;
+                    event.target.innerText = Math.round(averageValue).toString().padStart(4, '0'); // Format as 4 digits
+                }
+            });
+        }
+    });
+}
+
+// Initialize auto-completion and prediction
+function initializeFeatures() {
+    setupAutoCompletion();
+    setupPrediction();
+}
+
+// Call the initialization function when the page loads
+window.addEventListener('load', () => {
+    fetchPredictionData();
+    initializeFeatures();
+});
 </script>
 
 
