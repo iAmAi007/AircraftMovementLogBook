@@ -1318,8 +1318,8 @@ if ("serviceWorker" in navigator) {
 
 </script>
 
-<script>
-// Fetch data from predictiondata.html
+<script> 
+    // Fetch data from predictiondata.html
 let referenceData = []; // This will store the fetched data
 
 function fetchPredictionData() {
@@ -1340,14 +1340,14 @@ function fetchPredictionData() {
             });
 
             console.log('Fetched reference data:', referenceData);
+
+            // Initialize auto-completion and prediction after data is fetched
+            initializeFeatures();
         })
         .catch(error => {
             console.error('Error fetching prediction data:', error);
         });
 }
-
-// Call the function to fetch data when the page loads
-fetchPredictionData();
 
 // Auto-completion for editable cells
 function setupAutoCompletion() {
@@ -1367,7 +1367,7 @@ function setupAutoCompletion() {
         });
     });
 
-    // Auto-complete for "SVC" and "REG" cells
+    // Auto-complete for other editable cells
     document.querySelectorAll('td[contenteditable="true"]').forEach(cell => {
         if (!cell.classList.contains('from-cell') && !cell.classList.contains('dest-cell')) {
             cell.addEventListener('input', (event) => {
@@ -1414,12 +1414,10 @@ function initializeFeatures() {
     setupPrediction();
 }
 
-// Call the initialization function when the page loads
-window.addEventListener('load', () => {
-    fetchPredictionData();
-    initializeFeatures();
-});
+// Call the fetch function when the page loads
+window.addEventListener('load', fetchPredictionData);
 </script>
+
 
 
 </body>
