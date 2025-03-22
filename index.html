@@ -684,16 +684,16 @@ const predefinedData = {
         "A6", "5Y", "PH","5X"
     ],
     TYPE: [
-        "B39M", "B788", "BCS3", "DHBD", "E145", "B737", "A330", "CRJ9", "E145", "B773", 
-        "E190", "DHBD", "B38M", "B789", "AT75", "C208", "F406", "F50", "AS32"
+        "B39M", "B788", "BCS3", "DH8D", "E145", "B737", "A330", "CRJ9", "E145", "B773", 
+        "E190", "DH8D", "B38M","AT45", "B77W","PC12","DH8A","DH8B","C172","C206", "B789", "AT75", "C208", "F406", "F50", "AS32"
     ],
     FROM: [
-        "OMDB", "VABB", "HTMW", "HKJK", "HTIR", "HTDO", "HTGW", "HTZA", "HTSO", "HTKA", 
+        "OMDB", "VABB", "HTMW", "HKJK", "HTIR", "HTDO" , "HTDA", "HTGW", "HTZA", "HTSO", "HTKA", 
         "FAOR", "HTKJ", "FZQA", "LTFM", "HAAB", "PQPB", "FVRG", "OTHH", "HRYR", "HUEN", 
         "FWCL", "FLSK", "HTMT", "OOMS", "HTAR", "EHAM"
     ],
     DEST: [
-        "OMDB", "VABB", "HTMW", "HKJK", "HTIR", "HTDO", "HTGW", "HTZA", "HTSO", "HTKA", 
+        "OMDB", "VABB", "HTMW", "HKJK", "HTIR", "HTDO", , "HTDA", "HTGW", "HTZA", "HTSO", "HTKA", 
         "FAOR", "HTKJ", "FZQA", "LTFM", "HAAB", "PQPB", "FVRG", "OTHH", "HRYR", "HUEN", 
         "FWCL", "FLSK", "HTMT", "HTAR", "EHAM"    ]
 };
@@ -730,8 +730,15 @@ function createFadedAutocomplete(cell) {
             const columnHeader = getColumnHeader(cell);
             const data = columnToDataMap[columnHeader] || [];
 
-            // Find the first match in the predefined data
-            const match = data.find(item => item.startsWith(input));
+            // Find the first match that starts with the input
+            const startsWithMatch = data.find(item => item.startsWith(input));
+
+            // Find the first match that contains the input
+            const containsMatch = data.find(item => item.includes(input));
+
+            // Use the first match from either method
+            const match = startsWithMatch || containsMatch;
+
             if (match) {
                 // Show the remaining part of the suggestion
                 suggestion.innerText = match.slice(input.length);
@@ -752,8 +759,15 @@ function createFadedAutocomplete(cell) {
                 const columnHeader = getColumnHeader(cell);
                 const data = columnToDataMap[columnHeader] || [];
 
-                // Find the first match in the predefined data
-                const match = data.find(item => item.startsWith(input));
+                // Find the first match that starts with the input
+                const startsWithMatch = data.find(item => item.startsWith(input));
+
+                // Find the first match that contains the input
+                const containsMatch = data.find(item => item.includes(input));
+
+                // Use the first match from either method
+                const match = startsWithMatch || containsMatch;
+
                 if (match) {
                     // Autofill the suggestion
                     cell.innerText = match;
@@ -837,6 +851,7 @@ function createFadedAutocomplete(cell) {
 // Apply faded autocomplete to all editable cells
 document.querySelectorAll('td[contenteditable="true"]').forEach(cell => {
     createFadedAutocomplete(cell);
-});    </script>
+});
+</script>
 </body>
 </html>
