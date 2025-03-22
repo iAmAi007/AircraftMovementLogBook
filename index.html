@@ -14,6 +14,12 @@
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <!-- Your existing styles -->
     <style>
+        .faded-suggestion {
+            color: #999; /* Darker gray for better visibility */
+            pointer-events: none; /* Ensure the suggestion doesn't interfere with clicks */
+            position: absolute; /* Position the suggestion absolutely */
+            margin-left: 2px; /* Add a small gap between the input and the suggestion */
+        }
         @font-face {
             font-family: 'SF Pro Display';
             src: url('SFPRODISPLAY-REGULAR.TTF') format('truetype');
@@ -149,7 +155,7 @@
 
         /* Style for the save icon */
         .save-icon {
-            position: fixed;
+            position: absolute;
             top: 20px; /* Adjust as needed */
             left: 20px; /* Adjust as needed */
             font-size: 24px; /* Icon size */
@@ -164,13 +170,12 @@
     </style>
 </head>
 <body>
-    <i class="fas fa-save save-icon" id="saveButton" title="Save"></i>
-
     <div class="slider">
         <div class="table-container">
             <!-- Left Table Section (INBOUND TFC) -->
             <div>
                 <div class="table-header">
+                    <i class="fas fa-save save-icon" id="saveButton" title="Save"></i>
                     <h2>INBOUND TFC</h2>
                     <div class="header-input">
                         <!-- DAY Dropdown -->
@@ -479,6 +484,16 @@ function addRows() {
         addRowButton.addEventListener('click', () => {
             const table = tableContainer.querySelector('table');
             const tbody = table.querySelector('tbody');
+
+            // Find the last AIM value in the table
+            const aimCells = table.querySelectorAll('.aim-cell:not(.header-cell)');
+            let lastAIMValue = 0;
+
+            if (aimCells.length > 0) {
+                const lastAIMCell = aimCells[aimCells.length - 1];
+                lastAIMValue = parseInt(lastAIMCell.innerText, 10) || 0;
+            }
+
             for (let i = 0; i < 5; i++) { // Append 5 rows
                 const newRow = tbody.insertRow();
 
@@ -490,6 +505,10 @@ function addRows() {
                         newCell.classList.add('aim-cell');
                         newCell.addEventListener('input', handleAIMInput);
                         newCell.addEventListener('blur', autoFormatAIM);
+
+                        // Assign the next AIM number
+                        lastAIMValue = (lastAIMValue % 999) + 1; // Wrap around after 999
+                        newCell.innerText = lastAIMValue.toString().padStart(3, '0');
                     } else if (tbody.rows[0].cells[j].classList.contains('pob-cell') || tbody.rows[0].cells[j].classList.contains('fr-cell')) {
                         newCell.classList.add(tbody.rows[0].cells[j].classList.contains('pob-cell') ? 'pob-cell' : 'fr-cell');
                         newCell.addEventListener('input', enforceNumericInputForPOBAndFR);
@@ -499,11 +518,16 @@ function addRows() {
                     } else {
                         newCell.addEventListener('input', enforceUppercase);
                     }
+
+                    // Apply faded autocomplete to new cells
+                    createFadedAutocomplete(newCell);
                 }
             }
         });
     });
 }
+
+
 
 // Function to set the current date and time
 function setCurrentDate() {
@@ -644,6 +668,107 @@ function saveHTML() {
 
 // Add event listener to the save button
 document.getElementById('saveButton').addEventListener('click', saveHTML);
+    
+const predefinedData = {
+    SVC: [
+        "ATC405", "ATC401", "ATC111", "ATC201", "ATC113", "ATC109", "ATC117", "ATC157", "ATC133", "ATC219", 
+        "ATC209", "ATC215", "ATC213", "ATC137", "ATC119", "ATC107", "ATC203", "ATC125", "ATC103", "KQA488", 
+        "THY603", "ETh827", "KQA482", "qtr1499", "ETH805", "AZB504", "LAM460", "AZW438", "OTRI476", "UAE725", 
+        "UNK032", "KQA484", "OMA705", "RWD442", "FDB1687", "UGD320", "ETH803", "KQA486", "MWI042", "KLM571",
+        "ATC110/1", "ATC200", "ATC112/3", "ATC108/9", "ATC116/7", "ATC157", "ATC132/3", "ATC218/9", "ATC208", "ATC214/5", "ATC213", "ATC136/7", "ATC118/9", "ATC156", "ATC106/7", "ATC202", "ATC404", "ATC400", "АТС124/5", "ATC102/3", "PRF717/8", "PRF400/1", "PRF713/2", "PRF420/1", "PRF416/7", "PRF642", "PRF612/3", "PRF422/3", "PRF721/0"
+
+    ],
+    REG: [
+        "5HTCP", "5HTCR", "5HTCI", "5HTCE", "5HTCK", "5HTCD", "5HTCB", "5HTCO", "5HTCM", 
+    "TC", "ET", "A7", "C9", "Z", "A6", "ZS", "A4O", "9XR", 
+        "A6", "5Y", "PH","5X"
+    ],
+    TYPE: [
+        "B39M", "B788", "BCS3", "DHBD", "E145", "B737", "A330", "CRJ9", "E145", "B773", 
+        "E190", "DHBD", "B38M", "B789", "AT75", "C208", "F406", "F50", "AS32"
+    ],
+    FROM: [
+        "OMDB", "VABB", "HTMW", "HKJK", "HTIR", "HTDO", "HTGW", "HTZA", "HTSO", "HTKA", 
+        "FAOR", "HTKJ", "FZQA", "LTFM", "HAAB", "PQPB", "FVRG", "OTHH", "HRYR", "HUEN", 
+        "FWCL", "FLSK", "HTMT", "OOMS", "HTAR"
+    ],
+    DEST: [
+        "OMDB", "VABB", "HTMW", "HKJK", "HTIR", "HTDO", "HTGW", "HTZA", "HTSO", "HTKA", 
+        "FAOR", "HTKJ", "FZQA", "LTFM", "HAAB", "PQPB", "FVRG", "OTHH", "HRYR", "HUEN", 
+        "FWCL", "FLSK", "HTMT", "HTAR"    ]
+};
+
+// Map column headers to their predefined data
+const columnToDataMap = {
+    'SVC': predefinedData.SVC,
+    'REG': predefinedData.REG,
+    'TYPE': predefinedData.TYPE,
+    'FROM': predefinedData.FROM,
+    'DEST': predefinedData.DEST
+};
+
+// Function to get the column header for a cell
+function getColumnHeader(cell) {
+    const table = cell.closest('table');
+    const headerRow = table.querySelector('thead tr');
+    const cellIndex = Array.from(cell.parentNode.children).indexOf(cell);
+    return headerRow.children[cellIndex].innerText.trim();
+}
+
+// Faded autocomplete function
+function createFadedAutocomplete(cell) {
+    let suggestion = document.createElement('span');
+    suggestion.className = 'faded-suggestion';
+    cell.appendChild(suggestion);
+
+    cell.addEventListener('input', function () {
+        const input = cell.innerText.toUpperCase();
+        suggestion.innerText = '';
+
+        if (input.length > 0) {
+            // Determine the column header
+            const columnHeader = getColumnHeader(cell);
+            const data = columnToDataMap[columnHeader] || [];
+
+            // Find the first match in the predefined data
+            const match = data.find(item => item.startsWith(input));
+            if (match) {
+                // Show the remaining part of the suggestion
+                suggestion.innerText = match.slice(input.length);
+            }
+        }
+    });
+
+    cell.addEventListener('keydown', function (event) {
+        if (event.key === 'Tab') {
+            event.preventDefault(); // Prevent default Tab behavior
+            const input = cell.innerText.toUpperCase();
+
+            // Determine the column header
+            const columnHeader = getColumnHeader(cell);
+            const data = columnToDataMap[columnHeader] || [];
+
+            // Find the first match in the predefined data
+            const match = data.find(item => item.startsWith(input));
+            if (match) {
+                // Autofill the suggestion
+                cell.innerText = match;
+                suggestion.innerText = ''; // Clear the faded suggestion
+            }
+        }
+    });
+
+    cell.addEventListener('blur', function () {
+        suggestion.innerText = ''; // Clear the faded suggestion when the cell loses focus
+    });
+}
+
+// Apply faded autocomplete to all editable cells
+document.querySelectorAll('td[contenteditable="true"]').forEach(cell => {
+    createFadedAutocomplete(cell);
+});
+    
+
     </script>
 </body>
 </html>
