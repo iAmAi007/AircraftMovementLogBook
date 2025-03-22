@@ -690,12 +690,12 @@ const predefinedData = {
     FROM: [
         "OMDB", "VABB", "HTMW", "HKJK", "HTIR", "HTDO", "HTGW", "HTZA", "HTSO", "HTKA", 
         "FAOR", "HTKJ", "FZQA", "LTFM", "HAAB", "PQPB", "FVRG", "OTHH", "HRYR", "HUEN", 
-        "FWCL", "FLSK", "HTMT", "OOMS", "HTAR"
+        "FWCL", "FLSK", "HTMT", "OOMS", "HTAR", "EHAM"
     ],
     DEST: [
         "OMDB", "VABB", "HTMW", "HKJK", "HTIR", "HTDO", "HTGW", "HTZA", "HTSO", "HTKA", 
         "FAOR", "HTKJ", "FZQA", "LTFM", "HAAB", "PQPB", "FVRG", "OTHH", "HRYR", "HUEN", 
-        "FWCL", "FLSK", "HTMT", "HTAR"    ]
+        "FWCL", "FLSK", "HTMT", "HTAR", "EHAM"    ]
 };
 
 // Map column headers to their predefined data
@@ -715,7 +715,7 @@ function getColumnHeader(cell) {
     return headerRow.children[cellIndex].innerText.trim();
 }
 
-// Faded autocomplete function
+// Function to create faded autocomplete
 function createFadedAutocomplete(cell) {
     let suggestion = document.createElement('span');
     suggestion.className = 'faded-suggestion';
@@ -740,20 +740,91 @@ function createFadedAutocomplete(cell) {
     });
 
     cell.addEventListener('keydown', function (event) {
-        if (event.key === 'Tab') {
-            event.preventDefault(); // Prevent default Tab behavior
-            const input = cell.innerText.toUpperCase();
+        // Handle TAB and ENTER keys
+        if (event.key === 'Tab' || event.key === 'Enter') {
+            event.preventDefault(); // Prevent default Tab or Enter behavior
 
-            // Determine the column header
-            const columnHeader = getColumnHeader(cell);
-            const data = columnToDataMap[columnHeader] || [];
+            // Only proceed if the cell is not empty
+            if (cell.innerText.trim() !== '') {
+                const input = cell.innerText.toUpperCase();
 
-            // Find the first match in the predefined data
-            const match = data.find(item => item.startsWith(input));
-            if (match) {
-                // Autofill the suggestion
-                cell.innerText = match;
-                suggestion.innerText = ''; // Clear the faded suggestion
+                // Determine the column header
+                const columnHeader = getColumnHeader(cell);
+                const data = columnToDataMap[columnHeader] || [];
+
+                // Find the first match in the predefined data
+                const match = data.find(item => item.startsWith(input));
+                if (match) {
+                    // Autofill the suggestion
+                    cell.innerText = match;
+                    suggestion.innerText = ''; // Clear the faded suggestion
+                }
+            }
+
+            // Move focus based on the key pressed
+            if (event.key === 'Tab') {
+                if (event.shiftKey) {
+                    // Shift+TAB: Move to the previous cell in the same row
+                    const prevCell = cell.previousElementSibling;
+                    if (prevCell) {
+                        prevCell.focus();
+                    }
+                } else {
+                    // TAB: Move to the next cell in the same row
+                    const nextCell = cell.nextElementSibling;
+                    if (nextCell) {
+                        nextCell.focus();
+                    }
+                }
+            } else if (event.key === 'Enter') {
+                // ENTER: Move to the same cell in the next row
+                const nextRow = cell.parentElement.nextElementSibling;
+                if (nextRow) {
+                    const nextCell = nextRow.cells[cell.cellIndex];
+                    if (nextCell) {
+                        nextCell.focus();
+                    }
+                }
+            }
+        }
+
+        // Handle arrow keys (up, down, left, right)
+        if (['ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight'].includes(event.key)) {
+            event.preventDefault(); // Prevent default arrow key behavior
+
+            let targetCell = null;
+
+            switch (event.key) {
+                case 'ArrowUp':
+                    // Move to the cell above
+                    const prevRow = cell.parentElement.previousElementSibling;
+                    if (prevRow) {
+                        targetCell = prevRow.cells[cell.cellIndex];
+                    }
+                    break;
+
+                case 'ArrowDown':
+                    // Move to the cell below
+                    const nextRow = cell.parentElement.nextElementSibling;
+                    if (nextRow) {
+                        targetCell = nextRow.cells[cell.cellIndex];
+                    }
+                    break;
+
+                case 'ArrowLeft':
+                    // Move to the previous cell in the same row
+                    targetCell = cell.previousElementSibling;
+                    break;
+
+                case 'ArrowRight':
+                    // Move to the next cell in the same row
+                    targetCell = cell.nextElementSibling;
+                    break;
+            }
+
+            // Focus the target cell if it exists
+            if (targetCell) {
+                targetCell.focus();
             }
         }
     });
@@ -766,9 +837,6 @@ function createFadedAutocomplete(cell) {
 // Apply faded autocomplete to all editable cells
 document.querySelectorAll('td[contenteditable="true"]').forEach(cell => {
     createFadedAutocomplete(cell);
-});
-    
-
-    </script>
+});    </script>
 </body>
 </html>
