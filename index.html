@@ -41,6 +41,7 @@
             overflow-x: auto;
             display: flex;
             justify-content: center;
+            align-items: center;
             min-height: 100vh;
             align-items: flex-start;
         }
@@ -48,17 +49,19 @@
             display: flex;
             gap: 20px;
             width: max-content;
-            align-items: flex-start;
+            align-items: stretch; /* Changed from flex-start to stretch for consistent height */
         }
         .table-wrapper {
             display: flex;
             flex-direction: column;
             align-items: flex-start;
+            justify-content: flex-start; /* Ensure consistent starting point */
         }
         table {
             border-collapse: collapse;
             table-layout: auto;
             min-width: 800px;
+            width: 100%; /* Ensure tables take full width of their wrapper */
         }
         thead {
             border-top: 1px solid #2c5175;
@@ -110,6 +113,7 @@
             margin-bottom: 10px;
             letter-spacing: 1px;
             width: 100%;
+            min-height: 40px; /* Ensure consistent height for headers */
         }
         .table-header h2 {
             font-size: 16px;
@@ -124,6 +128,7 @@
             align-items: center;
             gap: 10px;
         }
+
         .table-header .header-input select {
             margin-right: 20px;
         }
@@ -164,14 +169,14 @@
             font-size: 19px;
             color: #eb6028;
             cursor: pointer;
-            display: block;
             margin-bottom: 10px;
+            align-self: flex-start; /* Align save icon to the start of the flex container */
         }
         .inbound-save-icon:hover {
             color: #1a3a5a;
         }
         .outbound-spacer {
-            height: 34px; /* Matches save icon (24px font-size + 10px margin-bottom) */
+            height: 29px; /* Matches save icon (19px font-size + 10px margin-bottom) */
             display: block;
         }
         .add-row-btn {
@@ -678,20 +683,18 @@
             "B39M", "B788", "BCS3", "DH8D", "E145","GA7C", "EC25","B737", "E120", "BE20","A330", "CRJ9", "E145", "B773", 
             "E190", "DH8D", "B38M", "AT45", "B77W", "PC12", "DH8A", "DH8B", "C172", "C206", "B789", "AT75", "C208", "F406", "F50", "AS32"
         ],
-        FROM: [
+        AIRPORTS: [
             "ZGGG","FLKK","FQPB","HKMO","HKKI","HKNW","FZQA","FZAA","OMAA","OMDW","OOMS","FWKI","OMDB", "VABB", "HTMW", "HKJK", "HTIR", "HTDO", "HTDA", "HTGW", "HTZA", "HTSO", "HTKA", 
             "FAOR", "HTKJ", "FZQA", "LTFM", "HAAB", "PQPB", "FVRG", "OTHH", "HRYR", "HUEN", 
             "FWCL", "FLSK", "HTMT", "OOMS", "HTAR", "EHAM", "HTAI", "HTAL", "HTAR", "HTAS", "HTBA", "HTBB", "HTBE", "HTBF", "HTBG", "HTBH", "HTBJ", "HTBM", "HTBN", "HTBO", "HTBS", "HTBT", "HTBU", "HTBV", "HTBX", "HTBY", "HTCF", "HTCH", "HTCM", "HTCV", "HTDA", "HTDB", "HTDG", "HTDK", "HTDN", "HTDO", "HTDU", "HTDY", "HTEB", "HTEE", "HTEJ", "HTEN", "HTEQ", "HTER", "HTES", "HTEY", "HTFE", "HTFI", "HTFR", "HTGA", "HTGE", "HTGL", "HTGM", "HTGO", "HTGP", "HTGR", "HTGS", "HTGT", "HTGU", "HTGV", "HTGW", "HTGZ", "HTHB", "HTHG", "HTHI", "HTHM", "HTHR", "HTHS", "HTHY", "HTIA", "HTIF", "HTIH", "HTIK", "HTIL", "HTIR", "HTIW", "HTIY", "HTJN", "HTJO", "HTJR", "HTKA", "HTKB", "HTKC", "HTKD", "HTKE", "HTKF", "HTKG", "HTKH", "HTKI", "HTKJ", "HTKL", "HTKM", "HTKN", "HTKO", "HTKP", "HTKR", "HTKS", "HTKT", "HTKU", "HTKX", "HTLA", "HTLB", "HTLD", "HTLE", "HTLI", "HTLJ", "HTLK", "HTLL", "HTLM", "HTLN", "HTLO", "HTLP", "HTLR", "HTLS", "HTLT", "HTLU", "HTLV", "HTLW", "HTLY", "HTMA", "HTMD", "HTME", "HTMF", "HTMG", "HTMH", "HTMI", "HTMJ", "HTMK", "HTML", "HTMM", "HTMN", "HTMO", "HTMP", "HTMR", "HTMS", "HTMT", "HTMU", "HTMV", "HTMW", "HTMX", "HTMY", "HTNA", "HTNB", "HTND", "HTNF", "HTNG", "HTNH", "HTNJ", "HTNK", "HTNM", "HTNN", "HTNO", "HTNR", "HTNW", "HTNY", "HTNZ", "HTOM", "HTON", "HTOP", "HTOR", "HTOZ", "HTPD", "HTPE", "HTPP", "HTPT", "HTPW", "HTRA", "HTRB", "HTRE", "HTRG", "HTRL", "HTRN", "HTRS", "HTRU", "HTRX", "HTRZ", "HTSA", "HTSB", "HTSD", "HTSE", "HTSG", "HTSH", "HTSI", "HTSJ", "HTSK", "HTSL", "HTSM", "HTSN", "HTSO", "HTSS", "HTST", "HTSU", "HTSW", "HTSY", "HTTA", "HTTB", "HTTC", "HTTE", "HTTF", "HTTG", "HTTJ", "HTTL", "HTTN", "HTTO", "HTTR", "HTTS", "HTTU", "HTTV", "HTTX", "HTTY", "HTTZ", "HTUC", "HTUF", "HTUG", "HTUK", "HTUN", "HTUO", "HTUP", "HTUR", "HTUS", "HTUT", "HTUU", "HTUV", "HTUW", "HTUZ", "HTVR", "HTWA", "HTWB", "HTWH", "HTWI", "HTWK", "HTWS", "HTYA", "HTYE", "HTYO", "HTYW", "HTYY", "HTZA", "HTZI", "HTZW"
         ],
         'ADDRESSEE’S': [
             "DEP/HTAI", "DEP/HTAL", "DEP/HTAR", "DEP/HTAS", "DEP/HTBA", "DEP/HTBB", "DEP/HTBE", "DEP/HTBF", "DEP/HTBG", "DEP/HTBH", "DEP/HTBJ", "DEP/HTBM", "DEP/HTBN", "DEP/HTBO", "DEP/HTBS", "DEP/HTBT", "DEP/HTBU", "DEP/HTBV", "DEP/HTBX", "DEP/HTBY", "DEP/HTCF", "DEP/HTCH", "DEP/HTCM", "DEP/HTCV", "DEP/HTDA", "DEP/HTDB", "DEP/HTDG", "DEP/HTDK", "DEP/HTDN", "DEP/HTDO", "DEP/HTDU", "DEP/HTDY", "DEP/HTEB", "DEP/HTEE", "DEP/HTEJ", "DEP/HTEN", "DEP/HTEQ", "DEP/HTER", "DEP/HTES", "DEP/HTEY", "DEP/HTFE", "DEP/HTFI", "DEP/HTFR", "DEP/HTGA", "DEP/HTGE", "DEP/HTGL", "DEP/HTGM", "DEP/HTGO", "DEP/HTGP", "DEP/HTGR", "DEP/HTGS", "DEP/HTGT", "DEP/HTGU", "DEP/HTGV", "DEP/HTGW", "DEP/HTGZ", "DEP/HTHB", "DEP/HTHG", "DEP/HTHI", "DEP/HTHM", "DEP/HTHR", "DEP/HTHS", "DEP/HTHY", "DEP/HTIA", "DEP/HTIF", "DEP/HTIH", "DEP/HTIK", "DEP/HTIL", "DEP/HTIR", "DEP/HTIW", "DEP/HTIY", "DEP/HTJN", "DEP/HTJO", "DEP/HTJR", "DEP/HTKA", "DEP/HTKB", "DEP/HTKC", "DEP/HTKD", "DEP/HTKE", "DEP/HTKF", "DEP/HTKG", "DEP/HTKH", "DEP/HTKI", "DEP/HTKJ", "DEP/HTKL", "DEP/HTKM", "DEP/HTKN", "DEP/HTKO", "DEP/HTKP", "DEP/HTKR", "DEP/HTKS", "DEP/HTKT", "DEP/HTKU", "DEP/HTKX", "DEP/HTLA", "DEP/HTLB", "DEP/HTLD", "DEP/HTLE", "DEP/HTLI", "DEP/HTLJ", "DEP/HTLK", "DEP/HTLL", "DEP/HTLM", "DEP/HTLN", "DEP/HTLO", "DEP/HTLP", "DEP/HTLR", "DEP/HTLS", "DEP/HTLT", "DEP/HTLU", "DEP/HTLV", "DEP/HTLW", "DEP/HTLY", "DEP/HTMA", "DEP/HTMD", "DEP/HTME", "DEP/HTMF", "DEP/HTMG", "DEP/HTMH", "DEP/HTMI", "DEP/HTMJ", "DEP/HTMK", "DEP/HTML", "DEP/HTMM", "DEP/HTMN", "DEP/HTMO", "DEP/HTMP", "DEP/HTMR", "DEP/HTMS", "DEP/HTMT", "DEP/HTMU", "DEP/HTMV", "DEP/HTMW", "DEP/HTMX", "DEP/HTMY", "DEP/HTNA", "DEP/HTNB", "DEP/HTND", "DEP/HTNF", "DEP/HTNG", "DEP/HTNH", "DEP/HTNJ", "DEP/HTNK", "DEP/HTNM", "DEP/HTNN", "DEP/HTNO", "DEP/HTNR", "DEP/HTNW", "DEP/HTNY", "DEP/HTNZ", "DEP/HTOM", "DEP/HTON", "DEP/HTOP", "DEP/HTOR", "DEP/HTOZ", "DEP/HTPD", "DEP/HTPE", "DEP/HTPP", "DEP/HTPT", "DEP/HTPW", "DEP/HTRA", "DEP/HTRB", "DEP/HTRE", "DEP/HTRG", "DEP/HTRL", "DEP/HTRN", "DEP/HTRS", "DEP/HTRU", "DEP/HTRX", "DEP/HTRZ", "DEP/HTSA", "DEP/HTSB", "DEP/HTSD", "DEP/HTSE", "DEP/HTSG", "DEP/HTSH", "DEP/HTSI", "DEP/HTSJ", "DEP/HTSK", "DEP/HTSL", "DEP/HTSM", "DEP/HTSN", "DEP/HTSO", "DEP/HTSS", "DEP/HTST", "DEP/HTSU", "DEP/HTSW", "DEP/HTSY", "DEP/HTTA", "DEP/HTTB", "DEP/HTTC", "DEP/HTTE", "DEP/HTTF", "DEP/HTTG", "DEP/HTTJ", "DEP/HTTL", "DEP/HTTN", "DEP/HTTO", "DEP/HTTR", "DEP/HTTS", "DEP/HTTU", "DEP/HTTV", "DEP/HTTX", "DEP/HTTY", "DEP/HTTZ", "DEP/HTUC", "DEP/HTUF", "DEP/HTUG", "DEP/HTUK", "DEP/HTUN", "DEP/HTUO", "DEP/HTUP", "DEP/HTUR", "DEP/HTUS", "DEP/HTUT", "DEP/HTUU", "DEP/HTUV", "DEP/HTUW", "DEP/HTUZ", "DEP/HTVR", "DEP/HTWA", "DEP/HTWB", "DEP/HTWH", "DEP/HTWI", "DEP/HTWK", "DEP/HTWS", "DEP/HTYA", "DEP/HTYE", "DEP/HTYO", "DEP/HTYW", "DEP/HTYY", "DEP/HTZA", "DEP/HTZI", "DEP/HTZW"
-        ],
-        DEST: [
-            "ZGGG","FLKK","FQPB","HKMO","HKKI","HKNW","FZQA","FZAA","OMAA","OMDW","OOMS","FWKI","OMDB", "VABB", "HTMW", "HKJK", "HTIR", "HTDO", "HTDA", "HTGW", "HTZA", "HTSO", "HTKA", 
-            "FAOR", "HTKJ", "FZQA", "LTFM", "HAAB", "PQPB", "FVRG", "OTHH", "HRYR", "HUEN", 
-            "FWCL", "FLSK", "HTMT", "OOMS", "HTAR", "EHAM", "HTAI", "HTAL", "HTAR", "HTAS", "HTBA", "HTBB", "HTBE", "HTBF", "HTBG", "HTBH", "HTBJ", "HTBM", "HTBN", "HTBO", "HTBS", "HTBT", "HTBU", "HTBV", "HTBX", "HTBY", "HTCF", "HTCH", "HTCM", "HTCV", "HTDA", "HTDB", "HTDG", "HTDK", "HTDN", "HTDO", "HTDU", "HTDY", "HTEB", "HTEE", "HTEJ", "HTEN", "HTEQ", "HTER", "HTES", "HTEY", "HTFE", "HTFI", "HTFR", "HTGA", "HTGE", "HTGL", "HTGM", "HTGO", "HTGP", "HTGR", "HTGS", "HTGT", "HTGU", "HTGV", "HTGW", "HTGZ", "HTHB", "HTHG", "HTHI", "HTHM", "HTHR", "HTHS", "HTHY", "HTIA", "HTIF", "HTIH", "HTIK", "HTIL", "HTIR", "HTIW", "HTIY", "HTJN", "HTJO", "HTJR", "HTKA", "HTKB", "HTKC", "HTKD", "HTKE", "HTKF", "HTKG", "HTKH", "HTKI", "HTKJ", "HTKL", "HTKM", "HTKN", "HTKO", "HTKP", "HTKR", "HTKS", "HTKT", "HTKU", "HTKX", "HTLA", "HTLB", "HTLD", "HTLE", "HTLI", "HTLJ", "HTLK", "HTLL", "HTLM", "HTLN", "HTLO", "HTLP", "HTLR", "HTLS", "HTLT", "HTLU", "HTLV", "HTLW", "HTLY", "HTMA", "HTMD", "HTME", "HTMF", "HTMG", "HTMH", "HTMI", "HTMJ", "HTMK", "HTML", "HTMM", "HTMN", "HTMO", "HTMP", "HTMR", "HTMS", "HTMT", "HTMU", "HTMV", "HTMW", "HTMX", "HTMY", "HTNA", "HTNB", "HTND", "HTNF", "HTNG", "HTNH", "HTNJ", "HTNK", "HTNM", "HTNN", "HTNO", "HTNR", "HTNW", "HTNY", "HTNZ", "HTOM", "HTON", "HTOP", "HTOR", "HTOZ", "HTPD", "HTPE", "HTPP", "HTPT", "HTPW", "HTRA", "HTRB", "HTRE", "HTRG", "HTRL", "HTRN", "HTRS", "HTRU", "HTRX", "HTRZ", "HTSA", "HTSB", "HTSD", "HTSE", "HTSG", "HTSH", "HTSI", "HTSJ", "HTSK", "HTSL", "HTSM", "HTSN", "HTSO", "HTSS", "HTST", "HTSU", "HTSW", "HTSY", "HTTA", "HTTB", "HTTC", "HTTE", "HTTF", "HTTG", "HTTJ", "HTTL", "HTTN", "HTTO", "HTTR", "HTTS", "HTTU", "HTTV", "HTTX", "HTTY", "HTTZ", "HTUC", "HTUF", "HTUG", "HTUK", "HTUN", "HTUO", "HTUP", "HTUR", "HTUS", "HTUT", "HTUU", "HTUV", "HTUW", "HTUZ", "HTVR", "HTWA", "HTWB", "HTWH", "HTWI", "HTWK", "HTWS", "HTYA", "HTYE", "HTYO", "HTYW", "HTYY", "HTZA", "HTZI", "HTZW"
         ]
     };
+
+    predefinedData.FROM = predefinedData.AIRPORTS;
+    predefinedData.DEST = predefinedData.AIRPORTS;
 
     const columnToDataMap = {
         'SVC': predefinedData.SVC,
