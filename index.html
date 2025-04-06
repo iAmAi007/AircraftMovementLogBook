@@ -189,7 +189,6 @@
             color: #237cc0;
         }
 
-        /* Options Window Styles */
         .edge-floating-menu {
             width: 220px;
             background-color: rgba(255, 255, 255, 0.95);
@@ -205,9 +204,19 @@
             position: fixed;
             top: 50%;
             left: 50%;
-            transform: translate(-50%, -50%);
+            transform: translate(-50%, -50%) scale(0.95);
             display: none;
             z-index: 1000;
+            opacity: 0;
+            transition: 
+                opacity 0.3s ease-out,
+                transform 0.4s cubic-bezier(0.175, 0.885, 0.320, 1.275);
+        }
+
+        .edge-floating-menu.visible {
+            display: block;
+            opacity: 1;
+            transform: translate(-50%, -50%) scale(1);
         }
 
         .menu-item {
@@ -226,7 +235,7 @@
             height: 20px;
             margin-right: 12px;
             opacity: 0.8;
-            fill: #eb6028; /* Sets the SVG color */
+            fill: #eb6028;
         }
 
         .expand-icon {
@@ -248,11 +257,12 @@
             border-right: 5px solid transparent;
             border-top: 5px solid #202124;
             opacity: 0.6;
-            transition: transform 0.2s;
+            transition: all 0.3s cubic-bezier(0.25, 0.1, 0.25, 1.5);
         }
 
-        .expanded .expand-icon::enaryafter {
+        .expanded .expand-icon::after {
             transform: translate(-50%, -50%) rotate(90deg);
+            opacity: 0.9;
         }
 
         .separator {
@@ -266,17 +276,41 @@
             padding: 12px 12px 0;
             background: rgba(0, 0, 0, 0.03);
             border-top: 1px solid rgba(0, 0, 0, 0.08);
+            max-height: 0;
+            overflow: hidden;
+            transition: 
+                max-height 0.5s cubic-bezier(0.165, 0.840, 0.440, 1.000),
+                padding 0.4s ease-out,
+                opacity 0.3s ease-out;
+            opacity: 0;
+        }
+
+        .filter-expanded.open {
+            max-height: 200px;
+            padding: 12px 12px 0;
+            opacity: 1;
         }
 
         .filter-input {
             width: calc(100% - 16px);
             padding: 6px 8px;
             margin-bottom: 10px;
-            border: 1px solid #237cc0 !important;
+            border: 1px solid #237cc0;
             border-radius: 4px;
             color: #18557a;
             font-family: inherit;
             text-transform: uppercase;
+            transform: translateY(-10px);
+            opacity: 0;
+            transition: 
+                transform 0.4s cubic-bezier(0.175, 0.885, 0.320, 1.275),
+                opacity 0.3s ease-out;
+        }
+
+        .filter-expanded.open .filter-input {
+            transform: translateY(0);
+            opacity: 1;
+            transition-delay: 0.1s;
         }
 
         .filter-input::placeholder {
@@ -289,6 +323,17 @@
             align-items: center;
             gap: 8px;
             padding: 0 8px 8px;
+            transform: translateY(-10px);
+            opacity: 0;
+            transition: 
+                transform 0.4s cubic-bezier(0.175, 0.885, 0.320, 1.275),
+                opacity 0.3s ease-out;
+        }
+
+        .filter-expanded.open .filter-buttons {
+            transform: translateY(0);
+            opacity: 1;
+            transition-delay: 0.15s;
         }
 
         .filter-count {
@@ -314,20 +359,38 @@
             margin-right: 5px;
             cursor: pointer;
             transition: background-color 0.3s ease, color 0.3s ease;
-            }
+        }
 
-            .filter-btn.clear:hover {
+        .filter-btn.clear:hover {
             background-color: #e0e0e0;
             color: #18557a;
-            }
+        }
 
         .filter-btn.apply {
-            background: #0078d4;
+            background: #237cc0;
             color: white;
         }
 
         .filter-btn.apply:hover {
             background: #106ebe;
+        }
+
+        tbody tr {
+            transition: 
+                opacity 0.3s ease-out,
+                transform 0.4s cubic-bezier(0.175, 0.885, 0.320, 1.275);
+        }
+
+        tbody tr.new-row {
+            opacity: 0;
+            transform: translateY(-10px);
+        }
+
+        tbody tr.hidden {
+            opacity: 0;
+            transform: translateY(-10px);
+            height: 0;
+            padding: 0;
         }
 
         @media print {
@@ -443,7 +506,7 @@
                         <span>Filter</span>
                         <div class="expand-icon"></div>
                     </div>
-                    <div class="filter-expanded" id="filter-expanded" style="display: none;">
+                    <div class="filter-expanded" id="filter-expanded">
                         <input type="text" class="filter-input" id="filterInput" placeholder="Type to filter...">
                         <div class="filter-buttons">
                             <span class="filter-count" id="filterCount">Filtered: 0</span>
@@ -1249,7 +1312,7 @@
                                 <td contenteditable="true" inputmode="numeric" class="fr-cell"></td>
                                 <td contenteditable="true"></td>
                             </tr>
-                           
+
                         </tbody>
                     </table>
                     <button class="add-row-btn"><i class="fas fa-plus"></i></button>
@@ -1393,6 +1456,8 @@
 
                         for (let i = 0; i < 5; i++) {
                             const newRow = tbody.insertRow();
+                            newRow.classList.add('new-row');
+                            
                             for (let j = 0; j < tbody.rows[0].cells.length; j++) {
                                 const newCell = newRow.insertCell();
                                 newCell.contentEditable = true;
@@ -1421,6 +1486,10 @@
                                 }
                                 createFadedAutocomplete(newCell);
                             }
+
+                            setTimeout(() => {
+                                newRow.classList.remove('new-row');
+                            }, 50);
                         }
                     });
                     addRowButton.dataset.listenerAdded = 'true';
@@ -1517,133 +1586,177 @@
         }
 
         function filterTables() {
-    const filterValues = document.getElementById('filterInput').value.trim().toUpperCase().split(',').map(val => val.trim()).filter(val => val);
-    const tables = document.querySelectorAll('.table-container table');
-    let totalVisibleRows = 0;
+            const filterValues = document.getElementById('filterInput').value.trim().toUpperCase().split(',').map(val => val.trim()).filter(val => val);
+            const tables = document.querySelectorAll('.table-container table');
+            let totalVisibleRows = 0;
 
-    tables.forEach((table) => {
-        const tbody = table.querySelector('tbody');
-        const headers = Array.from(table.querySelector('thead tr').children).map(th => th.innerText);
-        const rows = tbody.querySelectorAll('tr');
+            tables.forEach((table) => {
+                const tbody = table.querySelector('tbody');
+                const headers = Array.from(table.querySelector('thead tr').children).map(th => th.innerText);
+                const rows = tbody.querySelectorAll('tr');
 
-        rows.forEach(row => {
-            const cells = Array.from(row.querySelectorAll('td'));
-            const isEmptyRow = cells.every(cell => cell.innerText.trim() === '');
-            const aimIndex = headers.indexOf('AIM');
-            const hasOnlyAIM = aimIndex !== -1 && cells.length === headers.length && 
-                cells.every((cell, idx) => idx === aimIndex ? /^\d{3}$/.test(cell.innerText.trim()) : cell.innerText.trim() === '');
+                rows.forEach(row => {
+                    const cells = Array.from(row.querySelectorAll('td'));
+                    const isEmptyRow = cells.every(cell => cell.innerText.trim() === '');
+                    const aimIndex = headers.indexOf('AIM');
+                    const hasOnlyAIM = aimIndex !== -1 && cells.length === headers.length && 
+                        cells.every((cell, idx) => idx === aimIndex ? /^\d{3}$/.test(cell.innerText.trim()) : cell.innerText.trim() === '');
 
-            if (isEmptyRow || hasOnlyAIM) {
-                row.style.display = 'none'; // Hide completely empty rows or rows with only AIM filled
-                return;
-            }
+                    if (isEmptyRow || hasOnlyAIM) {
+                        row.classList.add('hidden');
+                        row.style.display = 'none';
+                        return;
+                    }
 
-            let rowMatches = filterValues.length === 0;
+                    let rowMatches = filterValues.length === 0;
 
-            if (filterValues.length > 0) {
-                const addresseeIndex = headers.indexOf('ADDRESSEE’S');
-                const addresseeCell = addresseeIndex !== -1 ? cells[addresseeIndex] : null;
-                const hasOtherFilledCells = cells.some(cell => cell !== (aimIndex !== -1 ? cells[aimIndex] : null) && cell.innerText.trim() !== '');
+                    if (filterValues.length > 0) {
+                        const addresseeIndex = headers.indexOf('ADDRESSEE’S');
+                        const addresseeCell = addresseeIndex !== -1 ? cells[addresseeIndex] : null;
+                        const hasOtherFilledCells = cells.some(cell => cell !== (aimIndex !== -1 ? cells[aimIndex] : null) && cell.innerText.trim() !== '');
 
-                if (filterValues.includes('DEP/HTDA')) {
-                    const addresseeText = addresseeCell ? addresseeCell.innerText.toUpperCase() : '';
-                    rowMatches = (addresseeText === 'DEP/HTDA') || (hasOtherFilledCells && addresseeText !== 'DEP/HTDA' && !addresseeText.startsWith('DEP/'));
+                        if (filterValues.includes('DEP/HTDA')) {
+                            const addresseeText = addresseeCell ? addresseeCell.innerText.toUpperCase() : '';
+                            rowMatches = (addresseeText === 'DEP/HTDA') || (hasOtherFilledCells && addresseeText !== 'DEP/HTDA' && !addresseeText.startsWith('DEP/'));
+                        } else {
+                            rowMatches = cells.some(cell => {
+                                const cellText = cell.innerText.toUpperCase();
+                                return filterValues.some(val => cellText.includes(val));
+                            });
+                        }
+                    }
+
+                    if (rowMatches) {
+                        row.classList.remove('hidden');
+                        row.style.display = '';
+                        totalVisibleRows++;
+                    } else {
+                        row.classList.add('hidden');
+                        setTimeout(() => {
+                            row.style.display = 'none';
+                        }, 400); // Match transition duration
+                    }
+                });
+            });
+
+            document.getElementById('filterCount').innerText = `Filtered: ${totalVisibleRows}`;
+        }
+
+        function clearFilter() {
+            document.getElementById('filterInput').value = '';
+            const tables = document.querySelectorAll('.table-container table');
+            let totalVisibleRows = 0;
+
+            tables.forEach(table => {
+                const tbody = table.querySelector('tbody');
+                const rows = tbody.querySelectorAll('tr');
+
+                rows.forEach(row => {
+                    row.classList.remove('hidden');
+                    row.style.display = '';
+                    totalVisibleRows++;
+                });
+            });
+
+            document.getElementById('filterCount').innerText = `Filtered: ${totalVisibleRows}`;
+        }
+
+        const optionsMenu = document.getElementById('optionsMenu');
+        const filterToggle = document.getElementById('filter-toggle');
+        const filterExpanded = document.getElementById('filter-expanded');
+        const saveOption = document.getElementById('saveOption');
+        const applyFilter = document.getElementById('applyFilter');
+        const clearFilterBtn = document.getElementById('clearFilter');
+        const filterInput = document.getElementById('filterInput');
+
+        document.addEventListener('keydown', (e) => {
+            if (e.ctrlKey && e.key === '0') {
+                e.preventDefault();
+                const isVisible = optionsMenu.classList.contains('visible');
+                if (!isVisible) {
+                    optionsMenu.style.display = 'block';
+                    setTimeout(() => {
+                        optionsMenu.classList.add('visible');
+                    }, 10);
+                    filterInput.focus();
                 } else {
-                    rowMatches = cells.some(cell => {
-                        const cellText = cell.innerText.toUpperCase();
-                        return filterValues.some(val => cellText.includes(val));
-                    });
+                    optionsMenu.classList.remove('visible');
+                    setTimeout(() => {
+                        optionsMenu.style.display = 'none';
+                    }, 400); // Match transition duration
                 }
+            } else if (e.key === 'Escape' && optionsMenu.classList.contains('visible')) {
+                e.preventDefault();
+                optionsMenu.classList.remove('visible');
+                filterExpanded.classList.remove('open');
+                filterToggle.classList.remove('expanded');
+                setTimeout(() => {
+                    optionsMenu.style.display = 'none';
+                    filterExpanded.style.display = 'none';
+                }, 400); // Match transition duration
             }
-
-            row.style.display = rowMatches ? '' : 'none';
-            if (rowMatches) totalVisibleRows++;
         });
-    });
 
-    document.getElementById('filterCount').innerText = `Filtered: ${totalVisibleRows}`;
-    console.log(`Filtered: ${totalVisibleRows}`);
-}
-
-function clearFilter() {
-    document.getElementById('filterInput').value = '';
-    const tables = document.querySelectorAll('.table-container table');
-    let totalVisibleRows = 0;
-
-    tables.forEach(table => {
-        const tbody = table.querySelector('tbody');
-        const rows = tbody.querySelectorAll('tr');
-
-        rows.forEach(row => {
-            row.style.display = ''; // Show all rows, including empty ones and AIM-only rows
-            totalVisibleRows++;
+        document.addEventListener('click', (e) => {
+            if (!e.target.closest('.edge-floating-menu') && optionsMenu.classList.contains('visible')) {
+                optionsMenu.classList.remove('visible');
+                filterExpanded.classList.remove('open');
+                filterToggle.classList.remove('expanded');
+                setTimeout(() => {
+                    optionsMenu.style.display = 'none';
+                    filterExpanded.style.display = 'none';
+                }, 400); // Match transition duration
+            }
         });
-    });
 
-    document.getElementById('filterCount').innerText = `Filtered: ${totalVisibleRows}`;
-    console.log(`Filtered: ${totalVisibleRows}`);
-}
+        saveOption.addEventListener('click', () => {
+            saveHTML();
+            optionsMenu.classList.remove('visible');
+            setTimeout(() => {
+                optionsMenu.style.display = 'none';
+            }, 400);
+        });
 
-const optionsMenu = document.getElementById('optionsMenu');
-const filterToggle = document.getElementById('filter-toggle');
-const filterExpanded = document.getElementById('filter-expanded');
-const saveOption = document.getElementById('saveOption');
-const applyFilter = document.getElementById('applyFilter');
-const clearFilterBtn = document.getElementById('clearFilter');
-const filterInput = document.getElementById('filterInput');
+        filterToggle.addEventListener('click', () => {
+            const isExpanded = filterExpanded.classList.contains('open');
+            if (!isExpanded) {
+                filterExpanded.style.display = 'block';
+                setTimeout(() => {
+                    filterExpanded.classList.add('open');
+                }, 10);
+                filterToggle.classList.add('expanded');
+                filterInput.focus();
+            } else {
+                filterExpanded.classList.remove('open');
+                filterToggle.classList.remove('expanded');
+                setTimeout(() => {
+                    filterExpanded.style.display = 'none';
+                }, 500); // Match max-height transition
+            }
+        });
 
-document.addEventListener('keydown', (e) => {
-    if (e.ctrlKey && e.key === '0') {
-        e.preventDefault();
-        optionsMenu.style.display = optionsMenu.style.display === 'block' ? 'none' : 'block';
-        if (optionsMenu.style.display === 'block') filterInput.focus();
-    } else if (e.key === 'Escape' && optionsMenu.style.display === 'block') { // Add this block
-        e.preventDefault();
-        optionsMenu.style.display = 'none';
-        filterExpanded.style.display = 'none';
-        filterToggle.classList.remove('expanded');
-    } // End of added block
-});
+        applyFilter.addEventListener('click', () => {
+            filterTables();
+        });
 
-document.addEventListener('click', (e) => {
-    if (!e.target.closest('.edge-floating-menu') && optionsMenu.style.display === 'block') {
-        optionsMenu.style.display = 'none';
-        filterExpanded.style.display = 'none';
-        filterToggle.classList.remove('expanded');
-    }
-});
+        clearFilterBtn.addEventListener('click', () => {
+            clearFilter();
+            filterExpanded.classList.remove('open');
+            filterToggle.classList.remove('expanded');
+            setTimeout(() => {
+                filterExpanded.style.display = 'none';
+            }, 500);
+        });
 
-saveOption.addEventListener('click', () => {
-    saveHTML();
-    optionsMenu.style.display = 'none';
-});
+        filterInput.addEventListener('keypress', (event) => {
+            if (event.key === 'Enter') {
+                filterTables();
+            }
+        });
 
-filterToggle.addEventListener('click', () => {
-    const isExpanded = filterExpanded.style.display !== 'none';
-    filterExpanded.style.display = isExpanded ? 'none' : 'block';
-    filterToggle.classList.toggle('expanded', !isExpanded);
-    if (!isExpanded) filterInput.focus();
-});
-
-applyFilter.addEventListener('click', () => {
-    filterTables();
-});
-
-clearFilterBtn.addEventListener('click', () => {
-    clearFilter();
-    filterExpanded.style.display = 'none';
-    filterToggle.classList.remove('expanded');
-});
-
-filterInput.addEventListener('keypress', (event) => {
-    if (event.key === 'Enter') {
-        filterTables();
-    }
-});
-
-filterInput.addEventListener('input', (e) => {
-    e.target.value = e.target.value.toUpperCase();
-});
+        filterInput.addEventListener('input', (e) => {
+            e.target.value = e.target.value.toUpperCase();
+        });
 
         const predefinedData = {
             SVC: ["ATC405", "ATC401", "01", "02","03","04","05","06","07","ZANZ01","ZANZ02","ZANZ03","TANZ01","TANZ02","TANZ03","TANZ04","08","AUK900","JW9805","JW9807","FLZ103","FLZ105","FLZ201","FLZ202","FLZ306","FLZ304","FLZ303","CSV121","CSV122","CSV131","CSV124","CSV123","CSV134","CSV202","CSV207","CSV261","CSV999","CSV998","ATC111", "ATC201", "ATC113", "ATC109", "ATC117", "ATC157", "ATC133", "ATC219", 
@@ -1651,8 +1764,8 @@ filterInput.addEventListener('input', (e) => {
                 "THY603", "ETh827", "KQA482", "QTR1499", "ETH805", "AZB504", "LAM460", "AZW438", "QTR1476", "UAE725", 
                 "LNK032", "KQA484", "OMA705", "RWD442", "FDB1687", "UGD320", "ETH803", "KQA486", "MWI042", "KLM571",
                 "ATC110/1", "ATC200", "ATC112/3", "ATC108/9", "ATC116/7", "ATC157", "ATC132/3", "ATC218/9", "ATC208", "ATC214/5", "ATC213", "ATC136/7", "ATC118/9", "ATC156", "ATC106/7", "ATC202", "ATC404", "ATC400", "АТС124/5", "ATC102/3", "PRF717/8", "PRF400/1", "PRF713/2", "PRF420/1", "PRF416/7", "PRF642", "PRF612/3", "PRF422/3", "PRF721/0"],
-                REG: ["5HKKC", "5HCGZ", "5HMXY", "5HAAA", "5HAAC", "5HAAE", "5HAAF", "5HAAG", "5HFLS", "5HFOX", "5HFZA", "5HGAS", "5HGEN", "5HGUS", "5HHEL", "5HIHN", "5HIKA", "5HIKI", "5HJAM", "5HAAU", "5HJOE", "5HAAJ", "5HAAK", "5HAAL", "5HAAN", "5HAAH", "5HAAP", "5HAAQ", "5HABC", "5HAIR", "5HAJK", "5HALO", "5HAMH", "5HAMI", "5HARD", "5HATP", "5HBAT", "5HBEE", "5HBIG", "5HBTZ", "5HBYO", "5HCCT", "5HCFA", "5HCPT", "5HCTJ", "5HDJS", "5HDTS", "5HEWA", "5HEXP", "5HFAR", "5HMYM", "5HZRP", "5HZOE", "5HKEG", "5HKJS", "5HZOG", "5HLEO", "5HLUV", "5HZAI", "5HYES", "5HMAD", "5HMEA", "5HMEB", "5HMEC", "5HMED", "5HMEE", "5HMEF", "5HMEK", "5HMFH", "5HWKF", "5HMIK", "5HMPK", "5HTZC", "5HTWF", "5HTPK", "5HONE","5HONF","JW9805","JW9807", "5HMSO", "5HTPC", "5HTGF", "5HTEC", "5HTCJ", "5HTCH", "5HKIH", "5HTCF", "5HTCP", "5HTCR", "5HTCI", "5HTCE", "5HTCK", "5HTCD", "5HTCB", "5HTCO", "5HTCM", "5HTAQ", "5HTAM", "5HSTJ", "5HSPC", "5HMWA", "5HSPA", "5HSGR", "5HMXG", "5HPWG", "5HPWE", "5HPWD", "5HPWC", "5HPWB", "5HMWF", "5HPOP", "5HPOA", "5HOIL", "5HMZU", "5HMZT", "5HMZD", "5HMZC", "5HMYK", "5HMYJ", "5HMYI", "5HMYH", "5HMYG", "5HTCL", "5HLCL", "5HELI", "5HLPD", "5HMEI", "5HLAB", "5HMYO", "5HMYP", "5HMYR", "5HMYQ", "5HMYN", "5HAAV", "5HMYS", "5HMHN", "5HUNT", "5HNIT", "5HNIA", "5HSPD", "5HOYO", "5HTFM", "5HSPE", "5HMEM", "5HMEH", "5HMEL", "5HTFB", "5HTFA", "5HAAX", "5HTCQ", "5HVAN", "5HMZE", "5HFLA", "5HFLB", "5HMYT", "5HTFG", "5HBLN", "5HHAD", "5HNAR", "5HKMA", "5HLUA", "5HMEP", "5HMEO", "5HSRA", "5HMYY", "5HPTJ", "5HMYU", "5HGEO", "5HMZR", "5HAZH", "5HULR", "5HIGH", "5HMEN", "5HMEJ", "5HLVV", "5HUSU", "5HCDL", "5HBIL", "TC", "ET", "A7", "C9", "Z", "A6", "ZS", "A4O", "9XR", "A6", "5Y", "PH", "5X"],
-                TYPE: ["B39M", "B788", "BCS3", "DH8D", "E145","GA7C", "EC25","B737", "E120", "BE20","A330", "CRJ9", "E145", "B773", 
+            REG: ["5HKKC", "5HCGZ", "5HMXY", "5HAAA", "5HAAC", "5HAAE", "5HAAF", "5HAAG", "5HFLS", "5HFOX", "5HFZA", "5HGAS", "5HGEN", "5HGUS", "5HHEL", "5HIHN", "5HIKA", "5HIKI", "5HJAM", "5HAAU", "5HJOE", "5HAAJ", "5HAAK", "5HAAL", "5HAAN", "5HAAH", "5HAAP", "5HAAQ", "5HABC", "5HAIR", "5HAJK", "5HALO", "5HAMH", "5HAMI", "5HARD", "5HATP", "5HBAT", "5HBEE", "5HBIG", "5HBTZ", "5HBYO", "5HCCT", "5HCFA", "5HCPT", "5HCTJ", "5HDJS", "5HDTS", "5HEWA", "5HEXP", "5HFAR", "5HMYM", "5HZRP", "5HZOE", "5HKEG", "5HKJS", "5HZOG", "5HLEO", "5HLUV", "5HZAI", "5HYES", "5HMAD", "5HMEA", "5HMEB", "5HMEC", "5HMED", "5HMEE", "5HMEF", "5HMEK", "5HMFH", "5HWKF", "5HMIK", "5HMPK", "5HTZC", "5HTWF", "5HTPK", "5HONE","5HONF","JW9805","JW9807", "5HMSO", "5HTPC", "5HTGF", "5HTEC", "5HTCJ", "5HTCH", "5HKIH", "5HTCF", "5HTCP", "5HTCR", "5HTCI", "5HTCE", "5HTCK", "5HTCD", "5HTCB", "5HTCO", "5HTCM", "5HTAQ", "5HTAM", "5HSTJ", "5HSPC", "5HMWA", "5HSPA", "5HSGR", "5HMXG", "5HPWG", "5HPWE", "5HPWD", "5HPWC", "5HPWB", "5HMWF", "5HPOP", "5HPOA", "5HOIL", "5HMZU", "5HMZT", "5HMZD", "5HMZC", "5HMYK", "5HMYJ", "5HMYI", "5HMYH", "5HMYG", "5HTCL", "5HLCL", "5HELI", "5HLPD", "5HMEI", "5HLAB", "5HMYO", "5HMYP", "5HMYR", "5HMYQ", "5HMYN", "5HAAV", "5HMYS", "5HMHN", "5HUNT", "5HNIT", "5HNIA", "5HSPD", "5HOYO", "5HTFM", "5HSPE", "5HMEM", "5HMEH", "5HMEL", "5HTFB", "5HTFA", "5HAAX", "5HTCQ", "5HVAN", "5HMZE", "5HFLA", "5HFLB", "5HMYT", "5HTFG", "5HBLN", "5HHAD", "5HNAR", "5HKMA", "5HLUA", "5HMEP", "5HMEO", "5HSRA", "5HMYY", "5HPTJ", "5HMYU", "5HGEO", "5HMZR", "5HAZH", "5HULR", "5HIGH", "5HMEN", "5HMEJ", "5HLVV", "5HUSU", "5HCDL", "5HBIL", "TC", "ET", "A7", "C9", "Z", "A6", "ZS", "A4O", "9XR", "A6", "5Y", "PH", "5X"],
+            TYPE: ["B39M", "B788", "BCS3", "DH8D", "E145","GA7C", "EC25","B737", "E120", "BE20","A330", "CRJ9", "E145", "B773", 
                 "E190", "DH8D", "B38M", "AT45", "B763", "B77W", "PC12", "DH8A", "DH8B", "C172", "C206", "B789", "AT75", "C208", "F406", "F50", "AS32"],
             AIRPORTS: ["ZGGG","FLKK","FQPB","HKMO","HKKI","HKNW","FZQA","FZAA","OMAA","OMDW","OOMS","FWKI","OMDB", "VABB", "HTMW", "HKJK", "HTIR", "HTDO", "HTDA", "HTGW", "HTZA", "HTSO", "HTKA", 
                 "FAOR", "HTKJ", "FZQA", "LTFM", "HAAB", "PQPB", "FVRG", "OTHH", "HRYR", "HUEN", 
