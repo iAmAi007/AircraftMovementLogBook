@@ -1593,7 +1593,7 @@ const clearFilterBtn = document.getElementById('clearFilter');
 const filterInput = document.getElementById('filterInput');
 
 document.addEventListener('keydown', (e) => {
-    if (e.shiftKey && e.key === 'o') {
+    if (e.ctrlKey && e.key === '0') {
         e.preventDefault();
         optionsMenu.style.display = optionsMenu.style.display === 'block' ? 'none' : 'block';
         if (optionsMenu.style.display === 'block') filterInput.focus();
