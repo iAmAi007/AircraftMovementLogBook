@@ -1438,65 +1438,76 @@
             }
         }
 
-        function addRows() {
-            const tables = document.querySelectorAll('.table-container > div');
-            tables.forEach(tableContainer => {
-                const addRowButton = tableContainer.querySelector('.add-row-btn');
-                if (!addRowButton.dataset.listenerAdded) {
-                    addRowButton.addEventListener('click', () => {
-                        const table = tableContainer.querySelector('table');
-                        const tbody = table.querySelector('tbody');
-                        const aimCells = table.querySelectorAll('.aim-cell:not(.header-cell)');
-                        let lastAIMValue = 0;
+function addRows() {
+    const tables = document.querySelectorAll('.table-container > div');
+    tables.forEach(tableContainer => {
+        const addRowButton = tableContainer.querySelector('.add-row-btn');
+        
+        // Remove any existing listener to avoid duplicates (in case this runs multiple times)
+        addRowButton.removeEventListener('click', handleAddRow);
+        
+        // Attach the event listener
+        addRowButton.addEventListener('click', handleAddRow);
+    });
+}
 
-                        if (aimCells.length > 0) {
-                            const lastAIMCell = aimCells[aimCells.length - 1];
-                            lastAIMValue = parseInt(lastAIMCell.innerText, 10) || 0;
-                        }
+function handleAddRow(event) {
+    const tableContainer = event.target.closest('.table-wrapper');
+    const table = tableContainer.querySelector('table');
+    const tbody = table.querySelector('tbody');
+    const aimCells = table.querySelectorAll('.aim-cell:not(.header-cell)');
+    let lastAIMValue = 0;
 
-                        for (let i = 0; i < 5; i++) {
-                            const newRow = tbody.insertRow();
-                            newRow.classList.add('new-row');
-                            
-                            for (let j = 0; j < tbody.rows[0].cells.length; j++) {
-                                const newCell = newRow.insertCell();
-                                newCell.contentEditable = true;
-                                const isInboundTable = tableContainer.querySelector('h2').innerText === 'INBOUND TFC';
-                                const isOutboundTable = tableContainer.querySelector('h2').innerText === 'OUTBOUND TFC';
+    if (aimCells.length > 0) {
+        const lastAIMCell = aimCells[aimCells.length - 1];
+        lastAIMValue = parseInt(lastAIMCell.innerText, 10) || 0;
+    }
 
-                                if (tbody.rows[0].cells[j].classList.contains('aim-cell')) {
-                                    newCell.classList.add('aim-cell');
-                                    newCell.addEventListener('input', handleAIMInput);
-                                    newCell.addEventListener('blur', autoFormatAIM);
-                                    lastAIMValue = (lastAIMValue % 999) + 1;
-                                    newCell.innerText = lastAIMValue.toString().padStart(3, '0');
-                                } else if (tbody.rows[0].cells[j].classList.contains('pob-cell') || tbody.rows[0].cells[j].classList.contains('fr-cell')) {
-                                    newCell.classList.add(tbody.rows[0].cells[j].classList.contains('pob-cell') ? 'pob-cell' : 'fr-cell');
-                                    newCell.addEventListener('input', enforceNumericInputForPOBAndFR);
-                                } else if (tbody.rows[0].cells[j].getAttribute('inputmode') === 'numeric') {
-                                    newCell.setAttribute('inputmode', 'numeric');
-                                    newCell.addEventListener('input', enforceNumericInput);
-                                    if (isInboundTable && (j === 4 || j === 5 || j === 7 || j === 8)) {
-                                        newCell.addEventListener('blur', validateFourNumeric);
-                                    } else if (isOutboundTable && (j === 5 || j === 6)) {
-                                        newCell.addEventListener('blur', validateFourNumeric);
-                                    }
-                                } else {
-                                    newCell.addEventListener('input', enforceUppercase);
-                                }
-                                createFadedAutocomplete(newCell);
-                            }
+    for (let i = 0; i < 5; i++) {
+        const newRow = tbody.insertRow();
+        newRow.classList.add('new-row');
+        
+        for (let j = 0; j < tbody.rows[0].cells.length; j++) {
+            const newCell = newRow.insertCell();
+            newCell.contentEditable = true;
+            const isInboundTable = tableContainer.querySelector('h2').innerText === 'INBOUND TFC';
+            const isOutboundTable = tableContainer.querySelector('h2').innerText === 'OUTBOUND TFC';
 
-                            setTimeout(() => {
-                                newRow.classList.remove('new-row');
-                            }, 50);
-                        }
-                    });
-                    addRowButton.dataset.listenerAdded = 'true';
+            if (tbody.rows[0].cells[j].classList.contains('aim-cell')) {
+                newCell.classList.add('aim-cell');
+                newCell.addEventListener('input', handleAIMInput);
+                newCell.addEventListener('blur', autoFormatAIM);
+                newCell.addEventListener('keydown', handleTabKey);
+                lastAIMValue = (lastAIMValue % 999) + 1;
+                newCell.innerText = lastAIMValue.toString().padStart(3, '0');
+            } else if (tbody.rows[0].cells[j].classList.contains('pob-cell') || tbody.rows[0].cells[j].classList.contains('fr-cell')) {
+                newCell.classList.add(tbody.rows[0].cells[j].classList.contains('pob-cell') ? 'pob-cell' : 'fr-cell');
+                newCell.addEventListener('input', enforceNumericInputForPOBAndFR);
+            } else if (tbody.rows[0].cells[j].getAttribute('inputmode') === 'numeric') {
+                newCell.setAttribute('inputmode', 'numeric');
+                newCell.addEventListener('input', enforceNumericInput);
+                if (isInboundTable && (j === 4 || j === 5 || j === 7 || j === 8)) {
+                    newCell.addEventListener('blur', validateFourNumeric);
+                } else if (isOutboundTable && (j === 5 || j === 6)) {
+                    newCell.addEventListener('blur', validateFourNumeric);
                 }
-            });
+            } else {
+                newCell.addEventListener('input', enforceUppercase);
+            }
+
+            if (tbody.rows[0].cells[j].classList.contains('from-cell') || tbody.rows[0].cells[j].classList.contains('dest-cell')) {
+                newCell.classList.add(tbody.rows[0].cells[j].classList.contains('from-cell') ? 'from-cell' : 'dest-cell');
+                newCell.addEventListener('blur', validateFourAlphabets);
+            }
+
+            createFadedAutocomplete(newCell);
         }
 
+        setTimeout(() => {
+            newRow.classList.remove('new-row');
+        }, 50);
+    }
+}
         function setCurrentDate() {
             const currentDate = new Date();
             const formattedDate = currentDate.toISOString().split('T')[0];
@@ -1561,28 +1572,50 @@
             }
         });
 
-        function saveHTML() {
-            const docClone = document.documentElement.cloneNode(true);
-            const addRowButtons = docClone.querySelectorAll('.add-row-btn');
-            addRowButtons.forEach(button => button.remove());
-            const optionsMenu = docClone.querySelector('#optionsMenu');
-            if (optionsMenu) optionsMenu.style.display = 'none';
+function saveHTML() {
+    // Clone the entire document
+    const docClone = document.documentElement.cloneNode(true);
 
-            const currentDate = new Date();
-            const formattedDate = currentDate.toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' }).replace(/ /g, '_').toUpperCase();
-            const filename = `${formattedDate}_index.html`;
-            const htmlContent = docClone.outerHTML;
-            const blob = new Blob([htmlContent], { type: 'text/html' });
-            const url = URL.createObjectURL(blob);
-            const a = document.createElement('a');
-            a.href = url;
-            a.download = filename;
-            document.body.appendChild(a);
-            a.click();
-            document.body.removeChild(a);
-            URL.revokeObjectURL(url);
+    // Ensure the options menu is hidden in the saved file
+    const optionsMenuClone = docClone.querySelector('#optionsMenu');
+    if (optionsMenuClone) {
+        optionsMenuClone.classList.remove('visible');
+        optionsMenuClone.style.display = 'none';
+    }
 
-            addRows();
+    // Also ensure filter-expanded is hidden
+    const filterExpandedClone = docClone.querySelector('#filter-expanded');
+    if (filterExpandedClone) {
+        filterExpandedClone.classList.remove('open');
+        filterExpandedClone.style.display = 'none';
+    }
+
+    const filterToggleClone = docClone.querySelector('#filter-toggle');
+    if (filterToggleClone) {
+        filterToggleClone.classList.remove('expanded');
+    }
+
+    // Get the current date for the filename
+    const currentDate = new Date();
+    const formattedDate = currentDate.toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' }).replace(/ /g, '_').toUpperCase();
+    const filename = `${formattedDate}_aircraft_table.html`;
+
+    // Convert the cloned document to a string, preserving all content
+    const htmlContent = '<!DOCTYPE html>\n' + docClone.outerHTML;
+
+    // Create a Blob with the HTML content
+    const blob = new Blob([htmlContent], { type: 'text/html' });
+    const url = URL.createObjectURL(blob);
+
+    // Create a temporary link to trigger the download
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = filename;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+    addRows();
         }
 
         function filterTables() {
