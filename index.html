@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -1913,6 +1914,56 @@ function saveHTML() {
                 .then(registration => console.log("Service Worker registered with scope:", registration.scope))
                 .catch(error => console.error("Service Worker registration failed:", error));
         }
+
+// Double-tap detection for edge-floating-menu
+let lastTapTime = 0;
+const doubleTapDelay = 300;
+
+document.addEventListener('touchstart', (e) => {
+    const currentTime = new Date().getTime();
+    const tapInterval = currentTime - lastTapTime;
+
+    // Check if this is a double-tap
+    if (tapInterval < doubleTapDelay && tapInterval > 0) {
+        e.preventDefault(); // Prevent default behavior (e.g., zooming)
+        e.stopPropagation(); // Stop propagation to prevent other listeners from hiding the menu
+
+        const optionsMenu = document.getElementById('optionsMenu');
+        const isVisible = optionsMenu.classList.contains('visible');
+
+        if (!isVisible) {
+            // Show the menu
+            optionsMenu.style.display = 'block';
+            setTimeout(() => {
+                optionsMenu.classList.add('visible');
+            }, 10);
+            document.getElementById('filterInput').focus();
+        } else {
+            // Hide the menu with animation
+            optionsMenu.classList.remove('visible');
+            setTimeout(() => {
+                optionsMenu.style.display = 'none';
+            }, 400); // Match your CSS transition duration
+        }
+    }
+
+    lastTapTime = currentTime; // Update the last tap time
+}, { passive: false }); // Ensure preventDefault works on touch events
+
+// Modify the existing click listener to ignore touches
+document.addEventListener('click', (e) => {
+    if (e.pointerType === 'touch') return; // Ignore touch events for click listener
+    if (!e.target.closest('.edge-floating-menu') && optionsMenu.classList.contains('visible')) {
+        optionsMenu.classList.remove('visible');
+        filterExpanded.classList.remove('open');
+        filterToggle.classList.remove('expanded');
+        setTimeout(() => {
+            optionsMenu.style.display = 'none';
+            filterExpanded.style.display = 'none';
+        }, 400); // Match transition duration
+    }
+});
+        
     </script>
 </body>
 </html>
