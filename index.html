@@ -213,7 +213,6 @@
                 opacity 0.3s ease-out,
                 transform 0.4s cubic-bezier(0.175, 0.885, 0.320, 1.275);
         }
-
         .edge-floating-menu.visible {
             display: block;
             opacity: 1;
@@ -225,6 +224,14 @@
             display: flex;
             align-items: center;
             cursor: pointer;
+            height: 36px; /* Fixed height to ensure consistency */
+            box-sizing: border-box; /* Include padding in height */
+            line-height: 1; /* Normalize line height */
+        }
+
+        .menu-item span {
+            flex-grow: 1; /* Ensure text takes available space */
+            font-size: 14px;
         }
 
         .menu-item:hover {
@@ -237,32 +244,32 @@
             margin-right: 12px;
             opacity: 0.8;
             fill: #eb6028;
+            flex-shrink: 0; /* Prevent icon from shrinking */
         }
 
         .expand-icon {
+            width: 12px; /* Reduced size to fit better */
+            height: 12px;
             margin-left: auto;
-            width: 16px;
-            height: 16px;
-            position: relative;
+            flex-shrink: 0; /* Prevent shrinking */
+            display: flex;
+            align-items: center;
+            justify-content: center;
         }
 
         .expand-icon::after {
             content: "";
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
             width: 0;
             height: 0;
-            border-left: 5px solid transparent;
-            border-right: 5px solid transparent;
-            border-top: 5px solid #202124;
+            border-left: 4px solid transparent; /* Smaller arrow */
+            border-right: 4px solid transparent;
+            border-top: 4px solid #202124;
             opacity: 0.6;
             transition: all 0.3s cubic-bezier(0.25, 0.1, 0.25, 1.5);
         }
 
         .expanded .expand-icon::after {
-            transform: translate(-50%, -50%) rotate(90deg);
+            transform: rotate(90deg);
             opacity: 0.9;
         }
 
@@ -274,24 +281,25 @@
         }
 
         .filter-expanded {
-            padding: 12px 12px 0;
+            display: none; /* Explicitly hidden by default */
+            padding: 0; /* No padding when hidden */
             background: rgba(0, 0, 0, 0.03);
             border-top: 1px solid rgba(0, 0, 0, 0.08);
             max-height: 0;
             overflow: hidden;
+            opacity: 0;
             transition: 
                 max-height 0.5s cubic-bezier(0.165, 0.840, 0.440, 1.000),
                 padding 0.4s ease-out,
                 opacity 0.3s ease-out;
-            opacity: 0;
         }
 
         .filter-expanded.open {
+            display: block; /* Show when open */
             max-height: 200px;
-            padding: 12px 12px 0;
+            padding: 12px 12px 8px; /* Restore padding when open */
             opacity: 1;
         }
-
         .filter-input {
             width: calc(100% - 16px);
             padding: 6px 8px;
