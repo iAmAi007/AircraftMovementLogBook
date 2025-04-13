@@ -1454,76 +1454,121 @@
             }
         }
 
-function addRows() {
-    const tables = document.querySelectorAll('.table-container > div');
-    tables.forEach(tableContainer => {
-        const addRowButton = tableContainer.querySelector('.add-row-btn');
-        
-        // Remove any existing listener to avoid duplicates (in case this runs multiple times)
-        addRowButton.removeEventListener('click', handleAddRow);
-        
-        // Attach the event listener
-        addRowButton.addEventListener('click', handleAddRow);
-    });
-}
-
-function handleAddRow(event) {
-    const tableContainer = event.target.closest('.table-wrapper');
-    const table = tableContainer.querySelector('table');
-    const tbody = table.querySelector('tbody');
-    const aimCells = table.querySelectorAll('.aim-cell:not(.header-cell)');
-    let lastAIMValue = 0;
-
-    if (aimCells.length > 0) {
-        const lastAIMCell = aimCells[aimCells.length - 1];
-        lastAIMValue = parseInt(lastAIMCell.innerText, 10) || 0;
+        function addRows() {
+        const tables = document.querySelectorAll('.table-container > div');
+        tables.forEach(tableContainer => {
+            const addRowButton = tableContainer.querySelector('.add-row-btn');
+            
+            // Remove any existing listener to avoid duplicates
+            addRowButton.removeEventListener('click', handleAddRow);
+            
+            // Attach the event listener
+            addRowButton.addEventListener('click', handleAddRow);
+        });
     }
 
-    for (let i = 0; i < 5; i++) {
-        const newRow = tbody.insertRow();
-        newRow.classList.add('new-row');
-        
-        for (let j = 0; j < tbody.rows[0].cells.length; j++) {
-            const newCell = newRow.insertCell();
-            newCell.contentEditable = true;
-            const isInboundTable = tableContainer.querySelector('h2').innerText === 'INBOUND TFC';
+        // Modify the handleAddRow function to add FR validation
+        function handleAddRow(event) {
+            const tableContainer = event.target.closest('.table-wrapper');
+            const table = tableContainer.querySelector('table');
+            const tbody = table.querySelector('tbody');
+            const aimCells = table.querySelectorAll('.aim-cell:not(.header-cell)');
             const isOutboundTable = tableContainer.querySelector('h2').innerText === 'OUTBOUND TFC';
+            let lastAIMValue = 0;
 
-            if (tbody.rows[0].cells[j].classList.contains('aim-cell')) {
-                newCell.classList.add('aim-cell');
-                newCell.addEventListener('input', handleAIMInput);
-                newCell.addEventListener('blur', autoFormatAIM);
-                newCell.addEventListener('keydown', handleTabKey);
-                lastAIMValue = (lastAIMValue % 999) + 1;
-                newCell.innerText = lastAIMValue.toString().padStart(3, '0');
-            } else if (tbody.rows[0].cells[j].classList.contains('pob-cell') || tbody.rows[0].cells[j].classList.contains('fr-cell')) {
-                newCell.classList.add(tbody.rows[0].cells[j].classList.contains('pob-cell') ? 'pob-cell' : 'fr-cell');
-                newCell.addEventListener('input', enforceNumericInputForPOBAndFR);
-            } else if (tbody.rows[0].cells[j].getAttribute('inputmode') === 'numeric') {
-                newCell.setAttribute('inputmode', 'numeric');
-                newCell.addEventListener('input', enforceNumericInput);
-                if (isInboundTable && (j === 4 || j === 5 || j === 7 || j === 8)) {
-                    newCell.addEventListener('blur', validateFourNumeric);
-                } else if (isOutboundTable && (j === 5 || j === 6)) {
-                    newCell.addEventListener('blur', validateFourNumeric);
+            if (aimCells.length > 0) {
+                const lastAIMCell = aimCells[aimCells.length - 1];
+                lastAIMValue = parseInt(lastAIMCell.innerText, 10) || 0;
+            }
+
+            for (let i = 0; i < 5; i++) {
+                const newRow = tbody.insertRow();
+                newRow.classList.add('new-row');
+                
+                for (let j = 0; j < tbody.rows[0].cells.length; j++) {
+                    const newCell = newRow.insertCell();
+                    newCell.contentEditable = true;
+                    const isInboundTable = tableContainer.querySelector('h2').innerText === 'INBOUND TFC';
+
+                    if (tbody.rows[0].cells[j].classList.contains('aim-cell')) {
+                        newCell.classList.add('aim-cell');
+                        newCell.addEventListener('input', handleAIMInput);
+                        newCell.addEventListener('blur', autoFormatAIM);
+                        newCell.addEventListener('keydown', handleTabKey);
+                        lastAIMValue = (lastAIMValue % 999) + 1;
+                        newCell.innerText = lastAIMValue.toString().padStart(3, '0');
+                    } else if (tbody.rows[0].cells[j].classList.contains('pob-cell')) {
+                        newCell.classList.add('pob-cell');
+                        newCell.setAttribute('inputmode', 'numeric');
+                        newCell.addEventListener('input', enforceNumericInputForPOBAndFR);
+                    } else if (tbody.rows[0].cells[j].classList.contains('fr-cell')) {
+                        newCell.classList.add('fr-cell');
+                        newCell.setAttribute('inputmode', 'numeric');
+                        newCell.addEventListener('input', validateFRInput); // Changed to use validateFRInput
+                        if (isOutboundTable) {
+                            newCell.addEventListener('input', updateFRTotal);
+                            newCell.setAttribute('data-fr-listener', 'true');
+                        }
+                    } else if (tbody.rows[0].cells[j].getAttribute('inputmode') === 'numeric') {
+                        newCell.setAttribute('inputmode', 'numeric');
+                        newCell.addEventListener('input', enforceNumericInput);
+                        if (isInboundTable && (j === 4 || j === 5 || j === 7 || j === 8)) {
+                            newCell.addEventListener('blur', validateFourNumeric);
+                        } else if (isOutboundTable && (j === 5 || j === 6)) {
+                            newCell.addEventListener('blur', validateFourNumeric);
+                        }
+                    } else {
+                        newCell.addEventListener('input', enforceUppercase);
+                    }
+
+                    if (tbody.rows[0].cells[j].classList.contains('from-cell') || tbody.rows[0].cells[j].classList.contains('dest-cell')) {
+                        newCell.classList.add(tbody.rows[0].cells[j].classList.contains('from-cell') ? 'from-cell' : 'dest-cell');
+                        newCell.addEventListener('blur', validateFourAlphabets);
+                    }
+
+                    createFadedAutocomplete(newCell);
                 }
-            } else {
-                newCell.addEventListener('input', enforceUppercase);
-            }
 
-            if (tbody.rows[0].cells[j].classList.contains('from-cell') || tbody.rows[0].cells[j].classList.contains('dest-cell')) {
-                newCell.classList.add(tbody.rows[0].cells[j].classList.contains('from-cell') ? 'from-cell' : 'dest-cell');
-                newCell.addEventListener('blur', validateFourAlphabets);
+                setTimeout(() => {
+                    newRow.classList.remove('new-row');
+                }, 50);
             }
-
-            createFadedAutocomplete(newCell);
         }
 
-        setTimeout(() => {
-            newRow.classList.remove('new-row');
-        }, 50);
-    }
-}
+        // Update existing FR cells to use the new validation
+        document.querySelectorAll('.fr-cell').forEach(cell => {
+            if (!cell.hasAttribute('data-fr-listener')) {
+                cell.addEventListener('input', validateFRInput);
+                cell.addEventListener('input', updateFRTotal);
+                cell.setAttribute('data-fr-listener', 'true');
+            }
+        });
+
+        function validateFRInput(event) {
+            const cell = event.target;
+            let input = cell.innerText;
+            
+            // Remove any non-digit characters
+            input = input.replace(/\D/g, '');
+            
+            // Limit to 2 digits
+            if (input.length > 2) {
+                input = input.substring(0, 2);
+            }
+            
+            // Pad with leading zero if single digit
+            if (input.length === 1) {
+                input = '0' + input;
+            }
+            
+            // Update the cell content
+            cell.innerText = input;
+            
+            // Update the FR total
+            updateFRTotal();
+        }
+
+
         function setCurrentDate() {
             const currentDate = new Date();
             const formattedDate = currentDate.toISOString().split('T')[0];
@@ -1823,6 +1868,8 @@ function saveHTML() {
         };
         predefinedData.FROM = predefinedData.AIRPORTS;
         predefinedData.DEST = predefinedData.AIRPORTS;
+        predefinedData.FR = ["01", "02", "03", "04", "05", "06", "07", "08", "09", "10"];
+
 
         const columnToDataMap = {
             'SVC': predefinedData.SVC,
@@ -1832,6 +1879,8 @@ function saveHTML() {
             'DEST': predefinedData.DEST,
             'ADDRESSEE’S': predefinedData['ADDRESSEE’S']
         };
+        columnToDataMap['FR'] = predefinedData.FR;
+
 
         function getColumnHeader(cell) {
             const table = cell.closest('table');
@@ -1978,7 +2027,144 @@ document.addEventListener('click', (e) => {
         }, 400); // Match transition duration
     }
 });
-        
-    </script>
+
+function updateFRTotal() {
+    // 1. Get the outbound table element
+    const outboundTable = document.querySelector('.table-wrapper:nth-child(2) table');
+    if (!outboundTable) {
+        console.error('Outbound table not found');
+        return;
+    }
+    
+    // 2. Initialize counter and get all visible FR cells
+    let total = 0;
+    const frCells = outboundTable.querySelectorAll('tbody tr:not(.hidden) .fr-cell');
+    
+    // 3. Calculate the total
+    frCells.forEach(cell => {
+        const value = parseInt(cell.innerText, 10);
+        if (!isNaN(value)) {
+            total += value;
+        }
+    });
+
+    // 4. Format the total display (00 for zero, 01-09 for single digits)
+    const formattedTotal = total === 0 ? '00' : 
+                         (total < 10 ? `0${total}` : total.toString());
+
+    // 5. Get or create the total display element
+    let totalDisplay = document.querySelector('.fr-total');
+    const addRowBtn = outboundTable.closest('.table-wrapper').querySelector('.add-row-btn');
+    const frHeader = outboundTable.querySelector('thead th:nth-child(9)');
+    const tableWrapper = outboundTable.closest('.table-wrapper');
+
+    if (!frHeader || !addRowBtn || !tableWrapper) {
+        console.error('Required elements not found');
+        return;
+    }
+
+    // 6. Calculate positioning
+    const frHeaderRect = frHeader.getBoundingClientRect();
+    const tableWrapperRect = tableWrapper.getBoundingClientRect();
+    const addRowBtnRect = addRowBtn.getBoundingClientRect();
+
+    // Find first visible FR cell for alignment
+    let firstFrCell = null;
+    for (let cell of frCells) {
+        if (!cell.closest('tr').classList.contains('hidden')) {
+            firstFrCell = cell;
+            break;
+        }
+    }
+
+    // Calculate left offset
+    let leftOffset;
+    if (firstFrCell) {
+        const frCellRect = firstFrCell.getBoundingClientRect();
+        const paddingLeft = parseFloat(window.getComputedStyle(firstFrCell).paddingLeft) || 5;
+        leftOffset = frCellRect.left - tableWrapperRect.left + paddingLeft;
+    } else {
+        const paddingLeft = parseFloat(window.getComputedStyle(frHeader).paddingLeft) || 5;
+        leftOffset = frHeaderRect.left - tableWrapperRect.left + paddingLeft;
+    }
+
+    // Calculate vertical position
+    const bottomOffset = tableWrapperRect.bottom - addRowBtnRect.top + 6;
+    const manualYAdjust = -22;
+
+    // Create display element if it doesn't exist
+    if (!totalDisplay) {
+        totalDisplay = document.createElement('span');
+        totalDisplay.className = 'fr-total';
+        addRowBtn.parentNode.insertBefore(totalDisplay, addRowBtn);
+    }
+
+    // 7. Update the display with formatted total
+    totalDisplay.innerHTML = `
+        <style>
+            .fr-total {
+                color: red;
+                position: absolute;
+                left: ${leftOffset}px;
+                bottom: ${bottomOffset + manualYAdjust}px;
+                font-family: 'SF Pro Display', sans-serif;
+                font-size: 16px;
+                font-weight: 500;
+                letter-spacing: 1px;
+                white-space: nowrap;
+                z-index: 10;
+                visibility: visible;
+            }
+        </style>
+        ${formattedTotal}
+    `;
+}
+
+// Enhanced filter integration
+const originalFilterTables = filterTables;
+filterTables = function() {
+    originalFilterTables.apply(this, arguments);
+    setTimeout(updateFRTotal, 10); // Small delay to ensure DOM updates
+};
+
+// Enhanced clear filter integration
+const originalClearFilter = clearFilter;
+clearFilter = function() {
+    originalClearFilter.apply(this, arguments);
+    setTimeout(() => {
+        // Force re-calculation of all visible cells
+        document.querySelectorAll('.table-wrapper:nth-child(2) tbody tr')
+            .forEach(tr => tr.classList.remove('hidden'));
+        updateFRTotal();
+    }, 10);
+};
+
+// Initialize on load and after modifications
+document.addEventListener('DOMContentLoaded', updateFRTotal);
+document.addEventListener('input', function(e) {
+    if (e.target.classList.contains('fr-cell')) {
+        setTimeout(updateFRTotal, 10);
+    }
+});
+
+// Add mutation observer for dynamic changes
+const observer = new MutationObserver(function(mutations) {
+    mutations.forEach(function(mutation) {
+        if (mutation.type === 'attributes' && mutation.attributeName === 'class') {
+            setTimeout(updateFRTotal, 10);
+        }
+    });
+});
+
+// Observe the table body for row visibility changes
+const tbody = document.querySelector('.table-wrapper:nth-child(2) tbody');
+if (tbody) {
+    observer.observe(tbody, {
+        attributes: true,
+        subtree: true
+    });
+}
+
+        </script>
 </body>
 </html>
