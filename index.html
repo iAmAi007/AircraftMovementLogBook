@@ -1338,45 +1338,160 @@
     </div>
 
     <script>
-        function isValidAIMInput(input) {
-            return /^\d{1,3}$/.test(input) && parseInt(input, 10) >= 1 && parseInt(input, 10) <= 999;
-        }
+    function isValidAIMInput(input) {
+        // Only accept 1-3 digit numbers between 1-999
+        return /^\d{1,3}$/.test(input) && parseInt(input, 10) >= 1 && parseInt(input, 10) <= 999;
+    }
 
-        function generateAIMNumbers(startValue) {
-            const aimCells = document.querySelectorAll('.aim-cell:not(.header-cell)');
-            let currentValue = parseInt(startValue, 10);
-            if (isNaN(currentValue) || currentValue < 1 || currentValue > 999) return;
-            aimCells.forEach((cell, index) => {
-                if (index === 0) {
-                    cell.innerText = currentValue.toString().padStart(3, '0');
-                } else {
-                    currentValue = (currentValue % 999) + 1;
-                    cell.innerText = currentValue.toString().padStart(3, '0');
+    function formatAIMNumber(value) {
+        // Convert any valid number to 3-digit format with leading zeros
+        const num = parseInt(value, 10);
+        if (isNaN(num) || num < 1 || num > 999) return '';
+        return num.toString().padStart(3, '0');
+    }
+
+    function generateAIMNumbers(startValue) {
+        const aimCells = document.querySelectorAll('.aim-cell:not(.header-cell)');
+        let currentValue = parseInt(startValue, 10);
+        
+        // Validate starting value
+        if (isNaN(currentValue) || currentValue < 1 || currentValue > 999) {
+            return; // Don't proceed if invalid
+        }
+        
+        aimCells.forEach((cell, index) => {
+            if (index === 0) {
+                // Only update first cell if empty or invalid
+                if (cell.innerText.trim() === '' || !isValidAIMInput(cell.innerText.trim())) {
+                    cell.innerText = formatAIMNumber(currentValue);
                 }
-            });
-        }
-
-        function handleAIMInput(event) {
-            const cell = event.target;
-            const input = cell.innerText;
-            if (!isValidAIMInput(input)) {
-                cell.classList.add('invalid');
             } else {
-                cell.classList.remove('invalid');
+                // For other cells, increment based on first cell's value
+                const firstCellValue = parseInt(aimCells[0].innerText, 10) || 1;
+                currentValue = ((firstCellValue + index - 1) % 999) + 1;
+                cell.innerText = formatAIMNumber(currentValue);
+            }
+        });
+    }
+
+    function handleAIMInput(event) {
+        const cell = event.target;
+        const input = cell.innerText.trim();
+        
+        // Validate input in real-time
+        if (!isValidAIMInput(input)) {
+            cell.classList.add('invalid');
+        } else {
+            cell.classList.remove('invalid');
+            // Auto-format to 3 digits while typing
+            if (input.length === 3) {
+                cell.innerText = formatAIMNumber(input);
+                // Move cursor to end
+                const range = document.createRange();
+                const selection = window.getSelection();
+                range.selectNodeContents(cell);
+                range.collapse(false);
+                selection.removeAllRanges();
+                selection.addRange(range);
             }
         }
+    }
 
-        function autoFormatAIM(event) {
-            const cell = event.target;
-            const input = cell.innerText;
-            if (isValidAIMInput(input)) {
-                const numericValue = parseInt(input, 10);
-                cell.innerText = numericValue.toString().padStart(3, '0');
-                generateAIMNumbers(numericValue);
-            } else {
-                cell.classList.add('invalid');
+    function autoFormatAIM(event) {
+        const cell = event.target;
+        const input = cell.innerText.trim();
+        
+        if (isValidAIMInput(input)) {
+            // Format to 3 digits on blur
+            cell.innerText = formatAIMNumber(input);
+            
+            // Only generate numbers if this is the first cell
+            if (cell === document.querySelector('.aim-cell:not(.header-cell)')) {
+                generateAIMNumbers(parseInt(input, 10));
+            }
+        } else {
+            cell.classList.add('invalid');
+            // Revert to previous valid value or empty
+            const prevValue = cell.dataset.prevValue || '';
+            cell.innerText = prevValue;
+        }
+    }
+
+    // Initialize AIM cells
+    document.querySelectorAll('.aim-cell').forEach(cell => {
+        // Store previous value for reverting if needed
+        cell.addEventListener('focus', () => {
+            cell.dataset.prevValue = cell.innerText.trim();
+        });
+        
+        cell.addEventListener('input', handleAIMInput);
+        cell.addEventListener('blur', autoFormatAIM);
+        cell.addEventListener('keydown', (event) => {
+            // Handle Tab key
+            if (event.key === 'Tab') {
+                setTimeout(() => cell.blur(), 0);
+            }
+            // Prevent non-numeric input
+            if (!/[0-9]|Backspace|Delete|ArrowLeft|ArrowRight|Tab/.test(event.key)) {
+                event.preventDefault();
+            }
+        });
+        
+        // Format any existing content
+        if (cell.innerText.trim() && isValidAIMInput(cell.innerText.trim())) {
+            cell.innerText = formatAIMNumber(cell.innerText.trim());
+        }
+    });
+
+    
+
+    // Modify the add row function to maintain 3-digit AIM numbering
+    function handleAddRow(event) {
+        const tableContainer = event.target.closest('.table-wrapper');
+        const table = tableContainer.querySelector('table');
+        const tbody = table.querySelector('tbody');
+        
+        // Get current AIM values to determine next numbers
+        const aimCells = table.querySelectorAll('.aim-cell:not(.header-cell)');
+        let firstAIMValue = 1;
+        
+        if (aimCells.length > 0) {
+            firstAIMValue = parseInt(aimCells[0].innerText, 10) || 1;
+        }
+
+        for (let i = 0; i < 5; i++) {
+            const newRow = tbody.insertRow();
+            newRow.classList.add('new-row');
+            
+            for (let j = 0; j < tbody.rows[0].cells.length; j++) {
+                const newCell = newRow.insertCell();
+                newCell.contentEditable = true;
+
+                if (tbody.rows[0].cells[j].classList.contains('aim-cell')) {
+                    newCell.classList.add('aim-cell');
+                    newCell.addEventListener('focus', () => {
+                        newCell.dataset.prevValue = newCell.innerText.trim();
+                    });
+                    newCell.addEventListener('input', handleAIMInput);
+                    newCell.addEventListener('blur', autoFormatAIM);
+                    newCell.addEventListener('keydown', (event) => {
+                        if (event.key === 'Tab') {
+                            setTimeout(() => newCell.blur(), 0);
+                        }
+                        if (!/[0-9]|Backspace|Delete|ArrowLeft|ArrowRight|Tab/.test(event.key)) {
+                            event.preventDefault();
+                        }
+                    });
+                    
+                    // Calculate the next AIM number (3-digit format)
+                    const nextValue = (firstAIMValue + aimCells.length + i - 1) % 999 + 1;
+                    newCell.innerText = formatAIMNumber(nextValue);
+                }
+                // ... rest of the cell creation logic ...
             }
         }
+    }
+
 
         function handleTabKey(event) {
             if (event.key === 'Tab') {
@@ -1659,7 +1774,7 @@ function saveHTML() {
     // Get the current date for the filename
     const currentDate = new Date();
     const formattedDate = currentDate.toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' }).replace(/ /g, '_').toUpperCase();
-    const filename = `${formattedDate}_aircraft_table.html`;
+    const filename = `${formattedDate}_movement_logs.html`;
 
     // Convert the cloned document to a string, preserving all content
     const htmlContent = '<!DOCTYPE html>\n' + docClone.outerHTML;
